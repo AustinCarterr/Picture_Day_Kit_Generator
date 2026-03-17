@@ -1,0 +1,175 @@
+/**
+ * PhotoDay Brand Design Tokens
+ * Source: https://www.photoday.com/brand-guidelines + photoday.com CSS
+ * Last synced: 2026-03-17
+ *
+ * Usage:
+ *   <link rel="stylesheet" href="assets/brand.css">
+ *   Then reference via var(--pd-green), var(--pd-purple), etc.
+ */
+
+/* ─────────────────────────────────────────
+   FONTS
+   Adobe Fonts (Typekit) — loaded via fonts.css
+   ─────────────────────────────────────────
+   Display:  neue-haas-grotesk-display  (headings, hero text)
+   Text:     neue-haas-grotesk-text     (body, UI labels)
+   Serif:    p22-mackinac-pro           (accent, editorial)
+*/
+
+:root {
+
+  /* ── Brand Colors ── */
+  --pd-green:         #48af94;   /* Primary CTA, success, brand green */
+  --pd-green-medium:  #2b6959;   /* Hover state, dark green */
+  --pd-purple:        #612ad7;   /* Accent purple, highlights, selection */
+  --pd-pink:          #ea4970;   /* Accent pink, alerts, special callouts */
+  --pd-gold:          #f4a42f;   /* Warning, badge, AdvancePay accent */
+  --pd-violet-light:  #b4a0de;   /* Subtle purple tints */
+  --pd-violet-dark:   #0e071c;   /* Deep violet, dark UI backgrounds */
+
+  /* ── Neutrals ── */
+  --pd-white:         #ffffff;
+  --pd-black:         #000000;
+  --pd-gray-light:    #d3d3d5;   /* Borders, disabled states */
+  --pd-gray:          #6b6b73;   /* Secondary text, placeholders */
+  --pd-gray-medium:   #404045;   /* Body text on dark, dividers */
+  --pd-gray-dark:     #202023;   /* Near-black UI, cards on dark */
+
+  /* ── Brand Backgrounds ── */
+  --pd-bg-dark:       #0b0b1f;   /* Primary dark background (nav, hero) */
+  --pd-bg-light:      #f4f4f6;   /* Light page background */
+
+  /* ── Typography ── */
+  --pd-font-display:  'neue-haas-grotesk-display', 'Helvetica Neue', Arial, sans-serif;
+  --pd-font-text:     'neue-haas-grotesk-text', 'Helvetica Neue', Arial, sans-serif;
+  --pd-font-serif:    'p22-mackinac-pro', Georgia, serif;
+
+  /* ── Fallback stack (when Adobe Fonts not loaded) ── */
+  --pd-font-fallback: 'Helvetica Neue', Arial, sans-serif;
+
+  /* ── Radii ── */
+  --pd-radius-btn:    12px;
+  --pd-radius-sm:     8px;
+  --pd-radius-md:     16px;
+  --pd-radius-lg:     24px;
+  --pd-radius-pill:   999px;
+
+  /* ── Shadows ── */
+  --pd-shadow-sm:     0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+  --pd-shadow-md:     0 4px 16px rgba(0,0,0,0.16);
+  --pd-shadow-lg:     0 8px 32px rgba(0,0,0,0.22);
+  --pd-shadow-purple: 0 4px 24px rgba(97,42,215,0.28);
+
+  /* ── Gradients ── */
+  --pd-gradient-hero:   linear-gradient(135deg, #0b0b1f 0%, #1a0e3a 100%);
+  --pd-gradient-green:  linear-gradient(135deg, #48af94 0%, #2b6959 100%);
+  --pd-gradient-purple: linear-gradient(135deg, #612ad7 0%, #0e071c 100%);
+  --pd-gradient-gold:   linear-gradient(135deg, #f4a42f 0%, #e08010 100%);
+
+  /* ── Spacing scale ── */
+  --pd-space-xs:  4px;
+  --pd-space-sm:  8px;
+  --pd-space-md:  16px;
+  --pd-space-lg:  24px;
+  --pd-space-xl:  40px;
+  --pd-space-2xl: 64px;
+
+  /* ── Transitions ── */
+  --pd-transition: 0.2s ease;
+
+}
+
+/* ─────────────────────────────────────────
+   UTILITY CLASSES
+   ─────────────────────────────────────────*/
+
+/* Buttons */
+.pd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pd-space-sm);
+  padding: 10px 22px;
+  border-radius: var(--pd-radius-btn);
+  font-family: var(--pd-font-text);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  border: none;
+  transition: background var(--pd-transition), transform var(--pd-transition), box-shadow var(--pd-transition);
+  text-decoration: none;
+}
+.pd-btn-primary {
+  background: var(--pd-green);
+  color: var(--pd-white);
+}
+.pd-btn-primary:hover {
+  background: var(--pd-green-medium);
+  box-shadow: var(--pd-shadow-md);
+  transform: translateY(-1px);
+}
+.pd-btn-secondary {
+  background: transparent;
+  color: var(--pd-green);
+  border: 2px solid var(--pd-green);
+}
+.pd-btn-secondary:hover {
+  background: var(--pd-green);
+  color: var(--pd-white);
+}
+.pd-btn-purple {
+  background: var(--pd-purple);
+  color: var(--pd-white);
+}
+.pd-btn-purple:hover {
+  background: #4e1faf;
+  box-shadow: var(--pd-shadow-purple);
+  transform: translateY(-1px);
+}
+
+/* Text */
+.pd-text-green    { color: var(--pd-green); }
+.pd-text-purple   { color: var(--pd-purple); }
+.pd-text-pink     { color: var(--pd-pink); }
+.pd-text-gold     { color: var(--pd-gold); }
+.pd-text-muted    { color: var(--pd-gray); }
+
+/* Backgrounds */
+.pd-bg-dark       { background: var(--pd-bg-dark); color: var(--pd-white); }
+.pd-bg-light      { background: var(--pd-bg-light); color: var(--pd-black); }
+.pd-bg-green      { background: var(--pd-green); color: var(--pd-white); }
+.pd-bg-purple     { background: var(--pd-purple); color: var(--pd-white); }
+
+/* Cards */
+.pd-card {
+  background: var(--pd-white);
+  border-radius: var(--pd-radius-md);
+  box-shadow: var(--pd-shadow-sm);
+  padding: var(--pd-space-lg);
+}
+.pd-card-dark {
+  background: var(--pd-gray-dark);
+  border-radius: var(--pd-radius-md);
+  box-shadow: var(--pd-shadow-md);
+  padding: var(--pd-space-lg);
+  color: var(--pd-white);
+}
+
+/* Badges */
+.pd-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--pd-radius-pill);
+  font-family: var(--pd-font-text);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.pd-badge-green  { background: rgba(72,175,148,0.15); color: var(--pd-green); }
+.pd-badge-purple { background: rgba(97,42,215,0.15);  color: var(--pd-purple); }
+.pd-badge-gold   { background: rgba(244,164,47,0.15); color: var(--pd-gold); }
+.pd-badge-pink   { background: rgba(234,73,112,0.15); color: var(--pd-pink); }

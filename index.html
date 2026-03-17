@@ -4,18 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PhotoDay — Picture Day Asset Generator</title>
+  <!-- PhotoDay Brand Assets -->
+  <link rel="stylesheet" href="assets/brand.css">
+  <link rel="stylesheet" href="assets/fonts.css">
   <style>
     :root {
-      --blue: #1B6FEF; --blue-dk: #1248B3;
-      --navy: #0D1B2A; --navy-mid: #1B3A6B;
-      --slate: #334155; --gray: #6B7280;
-      --border: #E5E7EB; --bg: #F1F5F9; --white: #FFFFFF;
-      --green: #10B981; --green-lt: #D1FAE5;
-      --amber: #F59E0B; --amber-lt: #FEF3C7;
-      --red: #EF4444;
+      /* Legacy local aliases → mapped to PhotoDay brand tokens */
+      --blue:       var(--pd-purple);
+      --blue-dk:    #4e1faf;
+      --navy:       var(--pd-bg-dark);
+      --navy-mid:   var(--pd-violet-dark);
+      --slate:      var(--pd-gray-medium);
+      --gray:       var(--pd-gray);
+      --border:     var(--pd-gray-light);
+      --bg:         var(--pd-bg-light);
+      --white:      var(--pd-white);
+      --green:      var(--pd-green);
+      --green-lt:   rgba(72,175,148,0.15);
+      --amber:      var(--pd-gold);
+      --amber-lt:   rgba(244,164,47,0.15);
+      --red:        var(--pd-pink);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+    body { font-family: var(--pd-font-text);
            background: var(--bg); color: #1E293B; min-height: 100vh; }
 
     /* ── HEADER ── */
@@ -815,7 +826,7 @@ function deselectAllAssets() {
 function updateGenBtn() {
   const n = selAssets.size;
   const lbl = document.getElementById('gen-btn-label');
-  if (lbl) lbl.textContent = `Generate ${n} Asset${n !== 1 ? 's' : ''} in Canva`;
+  if (lbl) lbl.textContent = `Generate ${n} Asset${n !== 1 ? 's' : ''}`;
 }
 
 /* ══════════════════════════════════════════════
@@ -1157,5 +1168,16 @@ async function generate() {
 ══════════════════════════════════════════════ */
 init();
 </script>
+
+<!-- PhotoDay Brand Tokens (shared JS object for canvas renderers) -->
+<script src="assets/brand-tokens.js"></script>
+
+<footer style="text-align:center;padding:24px 16px 32px;font-family:var(--pd-font-text);font-size:12px;color:var(--pd-gray);letter-spacing:0.04em;">
+  <img src="https://cdn.prod.website-files.com/611970eeff02f896bda0d4f4/6119cbb00651c6269a691adc_nav-logo-wht.svg"
+       alt="PhotoDay" height="18" style="opacity:0.35;vertical-align:middle;margin-right:8px;filter:invert(1);">
+  Picture Day Asset Generator &nbsp;·&nbsp; Internal Tool &nbsp;·&nbsp;
+  <a href="https://www.photoday.com/brand-guidelines" target="_blank"
+     style="color:var(--pd-green);text-decoration:none;">Brand Guidelines</a>
+</footer>
 </body>
 </html>
