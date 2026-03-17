@@ -828,7 +828,7 @@ function deselectAllAssets() {
 function updateGenBtn() {
   const n = selAssets.size;
   const lbl = document.getElementById('gen-btn-label');
-  if (lbl) lbl.textContent = `Generate ${n} Asset${n !== 1 ? 's' : ''}`;
+  if (lbl) lbl.textContent = `Generate`;
 }
 
 /* ══════════════════════════════════════════════
@@ -915,31 +915,33 @@ function drawEmailBanner(ctx, W, H, cfg, logo) {
   ctx.fillStyle=hexToRgba(s,0.1); ctx.fill();
   ctx.fillStyle=s; ctx.fillRect(0,H*0.84,W,H*0.16);
   drawLogo(ctx,logo,PAD,H*0.07,H*0.19,s,pdLogo);
-  ctx.font='700 '+(H*0.066)+'px Arial,sans-serif';
+  ctx.font='700 '+(H*0.060)+'px Arial,sans-serif';
   ctx.fillStyle=hexToRgba(tp,0.8); ctx.textAlign='left';
-  ctx.fillText(jobName,PAD,H*0.36,W*0.54);
+  ctx.fillText(jobName,PAD,H*0.32,W*0.54);
   ctx.font='900 '+(H*0.138)+'px "Arial Black",Arial,sans-serif';
   ctx.fillStyle=tp;
   if (apReq) {
-    ctx.fillText('PICTURE DAY',PAD,H*0.50,W*0.56);
-    ctx.font='700 '+(H*0.065)+'px Arial,sans-serif';
-    ctx.fillStyle=s; ctx.fillText('REGISTRATION REQUIRED',PAD,H*0.59,W*0.56);
+    ctx.fillText('PICTURE DAY',PAD,H*0.47,W*0.56);
+    ctx.font='700 '+(H*0.062)+'px Arial,sans-serif';
+    ctx.fillStyle=s; ctx.fillText('REGISTRATION REQUIRED',PAD,H*0.56,W*0.56);
   } else {
-    ctx.fillText('GET READY FOR',PAD,H*0.485,W*0.56);
-    ctx.fillText('PICTURE DAY!',PAD,H*0.665,W*0.56);
+    ctx.fillText('GET READY FOR',PAD,H*0.455,W*0.56);
+    ctx.fillText('PICTURE DAY!',PAD,H*0.615,W*0.56);  /* tighter: was .485/.665 */
   }
   ctx.font='700 '+(H*0.058)+'px Arial,sans-serif';
-  ctx.fillStyle=s; ctx.textAlign='left'; ctx.fillText(date,PAD,H*0.78,W*0.5);
-  const bw=W*0.28,bh=H*0.13,bx=W*0.63+(W*0.33-bw)/2,by=H*0.18;
+  ctx.fillStyle=s; ctx.textAlign='left'; ctx.fillText(date,PAD,H*0.75,W*0.5);
+  const bw=W*0.28,bh=H*0.13,bx=W*0.63+(W*0.33-bw)/2,by=H*0.14;
   ctxBtn(ctx,cta,bx,by,bw,bh,s,ts,H*0.043,10);
   if (apReq) {
-    ctx.font='700 '+(H*0.038)+'px Arial,sans-serif';
+    ctx.font='700 '+(H*0.036)+'px Arial,sans-serif';
     ctx.fillStyle=hexToRgba(tp,0.85); ctx.textAlign='center';
-    ctx.fillText('HOW IT WORKS',W*0.79,H*0.385,W*0.32);
-    drawAPSteps(ctx, W*0.635, H*0.415, W*0.32, H*0.092, hexToRgba(tp,0.8));
+    ctx.fillText('HOW IT WORKS',W*0.79,H*0.365,W*0.32);
+    drawAPSteps(ctx, W*0.635, H*0.395, W*0.32, H*0.088, hexToRgba(tp,0.8));
   }
   if (qrImg) {
-    const qsz=H*0.26; drawQR(ctx,qrImg,W*0.88-qsz/2,H*0.535,qsz,'my.photoday.com');
+    /* QR aligned vertically with the date (~H*0.75 baseline) */
+    const qsz=H*0.20;
+    drawQR(ctx,qrImg,W*0.88-qsz/2,H*0.75-qsz*0.5,qsz,'my.photoday.com');
   }
   ctx.font='700 '+(H*0.054)+'px Arial,sans-serif';
   ctx.fillStyle=ts; ctx.textAlign='center';
@@ -956,12 +958,12 @@ function drawVerticalBanner(ctx, W, H, cfg, logo) {
   ctx.beginPath(); ctx.arc(W/2,H*0.35,W*0.33,0,Math.PI*2);
   ctx.fillStyle=hexToRgba(s,0.13); ctx.fill();
   const ls=W*0.3; drawLogo(ctx,logo,(W-ls)/2,H*0.2,ls,s,pdLogo);
-  ctx.font='900 '+(H*0.082)+'px "Arial Black",Arial,sans-serif';
+  ctx.font='900 '+(H*0.075)+'px "Arial Black",Arial,sans-serif';
   ctx.fillStyle=tp; ctx.textAlign='center';
-  ctx.fillText('PICTURE DAY',W/2,H*0.512);
-  ctx.fillStyle=s; ctx.fillText('IS COMING!',W/2,H*0.600);
-  ctx.font='700 '+(H*0.044)+'px Arial,sans-serif';
-  ctx.fillStyle=s; ctx.fillText(date,W/2,H*0.665);
+  ctx.fillText('PICTURE DAY',W/2,H*0.512,W-PAD*2);
+  ctx.fillStyle=s; ctx.fillText('IS COMING!',W/2,H*0.595,W-PAD*2);
+  ctx.font='700 '+(H*0.042)+'px Arial,sans-serif';
+  ctx.fillStyle=s; ctx.fillText(date,W/2,H*0.658,W-PAD*2);
   ctx.strokeStyle=hexToRgba(tp,0.18); ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.moveTo(PAD*2,H*0.705); ctx.lineTo(W-PAD*2,H*0.705); ctx.stroke();
   ctxBtn(ctx,cta,PAD,H*0.728,W-PAD*2,H*0.088,s,ts,H*0.033,8);
@@ -974,33 +976,44 @@ function drawHorizontalBanner(ctx, W, H, cfg, logo) {
   const {primary:p,secondary:s,jobName,date,cta,apReq,pdLogo}=cfg;
   const tp=onColor(p),ts=onColor(s),U=H;
   ctx.fillStyle=p; ctx.fillRect(0,0,W,H);
-  const ctaW=U*3.2; ctx.fillStyle=s; ctx.fillRect(W-ctaW,0,ctaW,H);
-  // Left: use pdLogo on a tinted box if no custom logo
-  if (logo || pdLogo) {
-    const lsrc = logo || pdLogo;
-    const ls=U*0.74, ratio=lsrc.width/lsrc.height;
-    const lw=ratio>=1?ls:ls*ratio, lh=ratio>=1?ls/ratio:ls;
-    ctx.drawImage(lsrc, U*0.14+(ls-lw)/2, (H-lh)/2, lw, lh);
+  const ctaW=U*2.8; ctx.fillStyle=s; ctx.fillRect(W-ctaW,0,ctaW,H);
+
+  /* Logo — left edge, full height with padding */
+  const lsrc=logo||pdLogo;
+  const lPad=U*0.1, lSize=U*0.8;
+  if (lsrc) {
+    const ratio=lsrc.width/lsrc.height;
+    const lw=ratio>=1?lSize:lSize*ratio, lh=ratio>=1?lSize/ratio:lSize;
+    ctx.drawImage(lsrc, lPad+(lSize-lw)/2, (H-lh)/2, lw, lh);
   }
-  ctx.font='700 '+(U*0.27)+'px Arial,sans-serif';
-  ctx.fillStyle=hexToRgba(tp,0.85); ctx.textAlign='left'; ctx.textBaseline='middle';
-  ctx.fillText(jobName,U*1.08,H/2,U*2.8);
-  ctx.fillStyle=hexToRgba(tp,0.2); ctx.fillRect(U*4.1,H*0.18,1.5,H*0.64);
-  const cx=U*4.1+(W-ctaW-U*4.1)/2;
-  ctx.font='900 '+(U*0.34)+'px "Arial Black",Arial,sans-serif';
-  ctx.fillStyle=tp; ctx.textAlign='center';
-  if (apReq) {
-    ctx.fillText('REGISTRATION REQUIRED',cx,H/2,W-ctaW-U*4.8);
-  } else {
-    ctx.fillText('GET READY FOR PICTURE DAY!',cx,H/2-U*0.03,W-ctaW-U*4.8);
-    ctx.font='500 '+(U*0.24)+'px Arial,sans-serif';
-    ctx.fillStyle=hexToRgba(tp,0.65);
-    ctx.fillText(date,cx,H/2+U*0.30,W-ctaW-U*4.8);
-  }
+
+  /* Text zone: after logo → before CTA */
+  const tX=U*1.05, tW=W-ctaW-tX-U*0.3;
+  ctx.textAlign='left'; ctx.textBaseline='middle';
+
+  /* Headline */
+  ctx.font='900 '+(U*0.36)+'px "Arial Black",Arial,sans-serif';
+  ctx.fillStyle=tp;
+  const headline = apReq ? 'REGISTRATION REQUIRED' : 'GET READY FOR PICTURE DAY!';
+  ctx.fillText(headline, tX, H*0.38, tW);
+
+  /* Job name */
+  ctx.font='600 '+(U*0.22)+'px Arial,sans-serif';
+  ctx.fillStyle=hexToRgba(tp,0.75);
+  ctx.fillText(jobName, tX, H*0.70, tW);
+
+  /* Date — right under job name */
+  ctx.font='500 '+(U*0.20)+'px Arial,sans-serif';
+  ctx.fillStyle=hexToRgba(tp,0.55);
+  ctx.fillText(date, tX, H*0.90, tW);
+
   ctx.textBaseline='alphabetic';
-  ctx.font='800 '+(U*0.27)+'px Arial,sans-serif';
+
+  /* CTA */
+  ctx.font='800 '+(U*0.26)+'px Arial,sans-serif';
   ctx.fillStyle=ts; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(cta,W-ctaW/2,H/2,ctaW-U*0.3); ctx.textBaseline='alphabetic';
+  ctx.fillText(cta, W-ctaW/2, H/2, ctaW-U*0.3);
+  ctx.textBaseline='alphabetic';
 }
 function drawSocialGraphic(ctx, W, H, cfg, logo) {
   const {primary:p,secondary:s,jobName,date,cta,lookupText,apReq,pdLogo}=cfg;
@@ -1121,51 +1134,74 @@ function drawPoster(ctx, W, H, cfg, logo) {
   ctx.fillStyle=hexToRgba(s,0.07); ctx.fill();
   ctx.beginPath(); ctx.arc(-W*0.15,H*0.85,W*0.62,0,Math.PI*2);
   ctx.fillStyle=hexToRgba(s,0.07); ctx.fill();
-  ctx.fillStyle=s; ctx.fillRect(0,0,W,H*0.062);
-  ctx.font='800 '+(H*0.026)+'px Arial,sans-serif';
+  /* Header bar */
+  ctx.fillStyle=s; ctx.fillRect(0,0,W,H*0.055);
+  ctx.font='800 '+(H*0.024)+'px Arial,sans-serif';
   ctx.fillStyle=ts; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(jobName,W/2,H*0.031,W-PAD*2); ctx.textBaseline='alphabetic';
-  const ls=W*0.24; drawLogo(ctx,logo,(W-ls)/2,H*0.082,ls,s,pdLogo);
+  ctx.fillText(jobName,W/2,H*0.0275,W-PAD*2); ctx.textBaseline='alphabetic';
+
+  /* Logo */
+  const ls=W*0.22; drawLogo(ctx,logo,(W-ls)/2,H*0.068,ls,s,pdLogo);
+
+  /* Rule */
   ctx.strokeStyle=hexToRgba(tp,0.22); ctx.lineWidth=3;
-  ctx.beginPath(); ctx.moveTo(PAD*2,H*0.28); ctx.lineTo(W-PAD*2,H*0.28); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(PAD*2,H*0.255); ctx.lineTo(W-PAD*2,H*0.255); ctx.stroke();
+
+  /* Main headline */
   ctx.font='900 '+(H*0.108)+'px "Arial Black",Arial,sans-serif';
   ctx.fillStyle=tp; ctx.textAlign='center';
   if (apReq) {
-    ctx.fillText('PICTURE DAY',W/2,H*0.40,W-PAD*2);
-    ctx.font='700 '+(H*0.054)+'px Arial,sans-serif';
-    ctx.fillStyle=s; ctx.fillText('REGISTRATION REQUIRED',W/2,H*0.47,W-PAD*2);
+    ctx.fillText('PICTURE DAY',W/2,H*0.368,W-PAD*2);
+    ctx.font='700 '+(H*0.052)+'px Arial,sans-serif';
+    ctx.fillStyle=s; ctx.fillText('REGISTRATION REQUIRED',W/2,H*0.432,W-PAD*2);
   } else {
-    ctx.fillText('GET READY FOR',W/2,H*0.39,W-PAD*2);
-    ctx.fillStyle=s; ctx.fillText('PICTURE DAY!',W/2,H*0.51,W-PAD*2);
+    ctx.fillText('GET READY FOR',W/2,H*0.365,W-PAD*2);
+    ctx.fillStyle=s; ctx.fillText('PICTURE DAY!',W/2,H*0.480,W-PAD*2);
   }
+
+  /* Rule */
   ctx.strokeStyle=hexToRgba(tp,0.22);
-  ctx.beginPath(); ctx.moveTo(PAD*2,H*0.555); ctx.lineTo(W-PAD*2,H*0.555); ctx.stroke();
-  ctx.font='600 '+(H*0.034)+'px Arial,sans-serif';
+  ctx.beginPath(); ctx.moveTo(PAD*2,H*0.518); ctx.lineTo(W-PAD*2,H*0.518); ctx.stroke();
+
+  /* Mark your calendar + date */
+  ctx.font='600 '+(H*0.032)+'px Arial,sans-serif';
   ctx.fillStyle=hexToRgba(tp,0.75); ctx.textAlign='center';
-  ctx.fillText('MARK YOUR CALENDAR',W/2,H*0.605);
-  ctx.font='700 '+(H*0.060)+'px Arial,sans-serif';
-  ctx.fillStyle=s; ctx.fillText(date,W/2,H*0.678);
+  ctx.fillText('MARK YOUR CALENDAR',W/2,H*0.562);
+  ctx.font='700 '+(H*0.058)+'px Arial,sans-serif';
+  ctx.fillStyle=s; ctx.fillText(date,W/2,H*0.628);
+
+  /* Rule */
   ctx.strokeStyle=hexToRgba(tp,0.22);
-  ctx.beginPath(); ctx.moveTo(PAD*2,H*0.715); ctx.lineTo(W-PAD*2,H*0.715); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(PAD*2,H*0.660); ctx.lineTo(W-PAD*2,H*0.660); ctx.stroke();
+
   if (apReq) {
-    ctx.font='700 '+(H*0.026)+'px Arial,sans-serif';
+    ctx.font='700 '+(H*0.025)+'px Arial,sans-serif';
     ctx.fillStyle=hexToRgba(tp,0.8); ctx.textAlign='center';
-    ctx.fillText('HOW IT WORKS',W/2,H*0.758);
-    drawAPSteps(ctx, PAD*2, H*0.776, W-PAD*4, H*0.056, hexToRgba(tp,0.75));
-    const bw=W*0.72,bh=H*0.062;
-    ctxBtn(ctx,cta,(W-bw)/2,H*0.864,bw,bh,s,ts,H*0.024,14);
+    ctx.fillText('HOW IT WORKS',W/2,H*0.700);
+    drawAPSteps(ctx, PAD*2, H*0.716, W-PAD*4, H*0.054, hexToRgba(tp,0.75));
+    const bw=W*0.72,bh=H*0.060;
+    ctxBtn(ctx,cta,(W-bw)/2,H*0.832,bw,bh,s,ts,H*0.022,14);
   } else {
-    const bw=W*0.72,bh=H*0.072;
-    ctxBtn(ctx,cta,(W-bw)/2,H*0.745,bw,bh,s,ts,H*0.027,14);
-    ctx.font='600 '+(H*0.025)+'px Arial,sans-serif';
+    const bw=W*0.72,bh=H*0.068;
+    ctxBtn(ctx,cta,(W-bw)/2,H*0.685,bw,bh,s,ts,H*0.026,14);
+
+    /* Lookup text */
+    ctx.font='500 '+(H*0.023)+'px Arial,sans-serif';
     ctx.fillStyle=hexToRgba(tp,0.72); ctx.textAlign='center';
-    ctx.fillText(lookupText,W/2,H*0.864,W-PAD*2);
-    if (qrImg) { const qsz=W*0.22; drawQR(ctx,qrImg,(W-qsz)/2,H*0.886,qsz,'my.photoday.com'); }
+    ctx.fillText(lookupText,W/2,H*0.778,W-PAD*2);
+
+    /* QR code — sized to fit between lookup text and footer */
+    if (qrImg) {
+      const qsz=W*0.16; /* 320px at W=2000, bottom = H*0.800+320 = 2720 < footer at H*0.930=2790 */
+      drawQR(ctx,qrImg,(W-qsz)/2,H*0.800,qsz,'my.photoday.com/g/'+cfg.accessCode);
+    }
   }
-  ctx.fillStyle=s; ctx.fillRect(0,H*0.938,W,H*0.062);
+
+  /* Footer bar */
+  ctx.fillStyle=s; ctx.fillRect(0,H*0.930,W,H*0.070);
   ctx.font='500 '+(H*0.019)+'px Arial,sans-serif';
   ctx.fillStyle=ts; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText('Powered by PhotoDay  ·  my.photoday.com',W/2,H*0.969);
+  ctx.fillText('Powered by PhotoDay  ·  my.photoday.com',W/2,H*0.965);
   ctx.textBaseline='alphabetic';
 }
 
