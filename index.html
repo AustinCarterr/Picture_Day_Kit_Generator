@@ -35,7 +35,8 @@
     .hdr { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
            padding: 18px 36px; display: flex; align-items: center; gap: 14px; }
     .hdr-logo { width: 42px; height: 42px; background: var(--blue); border-radius: 10px;
-                display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; }
+                display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+                overflow: hidden; padding: 7px; }
     .hdr h1 { color: #fff; font-size: 19px; font-weight: 800; letter-spacing: -.3px; }
     .hdr p  { color: rgba(255,255,255,.52); font-size: 12.5px; margin-top: 2px; }
     .hdr-badge { margin-left: auto; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
@@ -271,7 +272,10 @@
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-logo">📸</div>
+  <div class="hdr-logo">
+    <img src="https://cdn.prod.website-files.com/611970eeff02f896bda0d4f4/6119cbb00651c6269a691adc_nav-logo-wht.svg"
+         alt="PhotoDay" style="width:100%;height:100%;object-fit:contain;" />
+  </div>
   <div>
     <h1>Picture Day Asset Generator</h1>
     <p>Logo · Colors · AdvancePay · Generate marketing assets instantly in your browser</p>
@@ -280,7 +284,7 @@
 </div>
 <div class="how-to">
   <span>💡</span>
-  <span><strong>How to use:</strong> Fill out all 4 steps, choose which assets to create → click Generate → your PNG assets are created instantly in your browser — no account needed.</span>
+  <span><strong>How to use:</strong> Fill out all 4 steps, choose which assets to create → click Generate → your JPEG assets are created instantly in your browser — no account needed.</span>
 </div>
 
 <div class="wrap">
@@ -485,7 +489,7 @@
                 border-radius:10px;font-size:12.5px;color:#92400E;line-height:1.55;">
       <strong>What happens when you click Generate:</strong> Your selected assets are created
       <strong>instantly in your browser</strong> using your colors, logo, and job details.
-      Download each one as a PNG — ready to use right away in emails, social posts, websites, and print.
+      Download each one as a JPEG — ready to use right away in emails, social posts, websites, and print.
     </div>
   </div>
 
@@ -1310,8 +1314,8 @@ async function generate() {
     DRAWERS[idx](cv.getContext('2d'), W, H, cfg, logoImg);
 
     const asset   = ASSETS[idx];
-    const dataUrl = cv.toDataURL('image/png');
-    const fname   = FILENAMES[idx] + '-' + jobName.replace(/[^a-z0-9]/gi,'-').toLowerCase() + '.png';
+    const dataUrl = cv.toDataURL('image/jpeg', 0.93);
+    const fname   = FILENAMES[idx] + '-' + jobName.replace(/[^a-z0-9]/gi,'-').toLowerCase() + '.jpg';
 
     // Scale preview: max 500px wide, max 260px tall
     const scale = Math.min(500/W, 260/H, 1);
@@ -1322,7 +1326,7 @@ async function generate() {
       '<div style="background:#F8FAFC;padding:10px 14px;border-bottom:1px solid var(--border);' +
            'display:flex;align-items:center;justify-content:space-between;">' +
       '<div><div style="font-size:13px;font-weight:800;color:#0F172A;">' + asset.icon + ' ' + asset.name + '</div>' +
-           '<div style="font-size:11px;color:#6366F1;font-family:monospace;font-weight:600;">' + asset.dims + ' · PNG</div></div>' +
+           '<div style="font-size:11px;color:#6366F1;font-family:monospace;font-weight:600;">' + asset.dims + ' · JPEG</div></div>' +
       '<a href="' + dataUrl + '" download="' + fname + '" ' +
          'style="padding:7px 16px;background:var(--blue);color:#fff;border-radius:8px;' +
                 'font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap;">⬇ Download</a>' +
