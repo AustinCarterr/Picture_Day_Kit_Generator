@@ -735,7 +735,7 @@ function pickGallery(type) {
 
 function refreshQR() {
   const code = document.getElementById('access-code').value || '—';
-  document.getElementById('qr-val').textContent = code ? 'my.photoday.com/' + code : '—';
+  document.getElementById('qr-val').textContent = code ? 'my.photoday.com/g/' + code : '—';
 }
 
 /* ══════════════════════════════════════════════
@@ -968,7 +968,7 @@ function drawVerticalBanner(ctx, W, H, cfg, logo) {
   ctx.font='500 '+(H*0.028)+'px Arial,sans-serif';
   ctx.fillStyle=hexToRgba(tp,0.6); ctx.textAlign='center';
   ctx.fillText(lookupText,W/2,H*0.862,W-PAD*2);
-  ctx.fillText('my.photoday.com',W/2,H*0.900,W-PAD*2);
+  ctx.fillText('my.photoday.com/g/'+cfg.accessCode,W/2,H*0.900,W-PAD*2);
 }
 function drawHorizontalBanner(ctx, W, H, cfg, logo) {
   const {primary:p,secondary:s,jobName,date,cta,apReq,pdLogo}=cfg;
@@ -1090,7 +1090,7 @@ function drawReminderCard(ctx, W, H, cfg, logo) {
   const RX=LW+RW*0.08;
   if (qrImg) {
     const qsz=Math.min(RW*0.55, H*0.38);
-    drawQR(ctx,qrImg,LW+(RW-qsz)/2,H*0.08,qsz,'my.photoday.com/'+cfg.accessCode);
+    drawQR(ctx,qrImg,LW+(RW-qsz)/2,H*0.08,qsz,'my.photoday.com/g/'+cfg.accessCode);
   }
 
   // Right panel: "How to find your photos"
@@ -1224,7 +1224,7 @@ async function generate() {
   else cta = 'Order Photos Online';
 
   const lookupText = isPG
-    ? 'Text "' + code + '" to 90738 or visit my.photoday.com'
+    ? 'Text "' + code + '" to 90738 or visit my.photoday.com/g/' + code
     : 'Visit ' + galUrl;
 
   const cfg = {
@@ -1233,7 +1233,7 @@ async function generate() {
   };
 
   // Load QR code image (for Email Banner, Reminder Card, Poster)
-  const qrData = isPG && code ? encodeURIComponent('https://my.photoday.com/' + code) : null;
+  const qrData = isPG && code ? encodeURIComponent('https://my.photoday.com/g/' + code) : null;
   const qrSrc  = qrData ? 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + qrData + '&color=000000&bgcolor=FFFFFF&margin=4' : null;
 
   // Show output with loading state
