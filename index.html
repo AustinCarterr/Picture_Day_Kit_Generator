@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhotoDay — Picture Day Asset Generator</title>
+  <style>
+    :root {
+      --blue: #1B6FEF; --blue-dk: #1248B3;
+      --navy: #0D1B2A; --navy-mid: #1B3A6B;
+      --slate: #334155; --gray: #6B7280;
+      --border: #E5E7EB; --bg: #F1F5F9; --white: #FFFFFF;
+      --green: #10B981; --green-lt: #D1FAE5;
+      --amber: #F59E0B; --amber-lt: #FEF3C7;
+      --red: #EF4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+           background: var(--bg); color: #1E293B; min-height: 100vh; }
+
+    /* ── HEADER ── */
+    .hdr { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+           padding: 18px 36px; display: flex; align-items: center; gap: 14px; }
+    .hdr-logo { width: 42px; height: 42px; background: var(--blue); border-radius: 10px;
+                display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; }
+    .hdr h1 { color: #fff; font-size: 19px; font-weight: 800; letter-spacing: -.3px; }
+    .hdr p  { color: rgba(255,255,255,.52); font-size: 12.5px; margin-top: 2px; }
+    .hdr-badge { margin-left: auto; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+                 color: rgba(255,255,255,.8); font-size: 12px; font-weight: 700; padding: 5px 13px; border-radius: 20px; }
+
+    /* ── HOW-TO ── */
+    .how-to { background: #EFF6FF; border-bottom: 1px solid #BFDBFE;
+              padding: 10px 36px; font-size: 12.5px; color: #1D4ED8;
+              display: flex; align-items: center; gap: 8px; }
+
+    /* ── LAYOUT ── */
+    .wrap { max-width: 980px; margin: 30px auto; padding: 0 22px; }
+
+    /* ── CARD ── */
+    .card { background: var(--white); border-radius: 18px; padding: 28px 30px;
+            margin-bottom: 18px; box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04); }
+    .card-hdr { display: flex; align-items: center; gap: 13px; margin-bottom: 22px; }
+    .step-dot { width: 32px; height: 32px; background: var(--blue); color: #fff; border-radius: 50%;
+                display: flex; align-items: center; justify-content: center; font-weight: 800;
+                font-size: 13px; flex-shrink: 0; }
+    .step-dot.green  { background: var(--green); }
+    .card-title { font-size: 16px; font-weight: 800; color: #0F172A; }
+    .card-sub   { font-size: 12.5px; color: var(--gray); margin-top: 2px; }
+
+    /* ── FORM ── */
+    .row  { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    .row3 { grid-template-columns: 2fr 1fr 1fr; }
+    .row1 { grid-template-columns: 1fr; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 11px; font-weight: 700; color: #374151;
+            text-transform: uppercase; letter-spacing: .06em; }
+    input[type="text"], input[type="date"], input[type="url"], input[type="color"],
+    input[type="number"], select {
+      padding: 10px 13px; border: 2px solid var(--border); border-radius: 10px;
+      font-size: 14.5px; color: #1E293B; background: #fff; transition: border .18s, box-shadow .18s; width: 100%;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(27,111,239,.12); }
+    input::placeholder { color: #CBD5E1; }
+
+    /* ── JOB TYPE ── */
+    .jt-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+    .jt-card { border: 2px solid var(--border); border-radius: 12px; padding: 12px 6px;
+               text-align: center; cursor: pointer; transition: all .17s; background: #fff; }
+    .jt-card:hover { border-color: var(--blue); }
+    .jt-card.sel   { border-color: var(--blue); background: #EFF6FF; }
+    .jt-emoji { font-size: 20px; margin-bottom: 4px; display: block; }
+    .jt-lbl   { font-size: 10.5px; font-weight: 700; color: #374151; line-height: 1.2; }
+
+    /* ── AP TOGGLE SECTION ── */
+    .ap-box { margin-top: 18px; border: 2px solid var(--border); border-radius: 13px; overflow: hidden; }
+    .ap-toggle-row { padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+                     user-select: none; background: #F8FAFC; transition: background .15s; }
+    .ap-toggle-row:hover { background: #EFF6FF; }
+    .toggle-wrap { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+    .toggle-wrap input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #D1D5DB; border-radius: 24px; transition: .25s; cursor: pointer; }
+    .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px;
+                              left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .25s; }
+    input:checked + .toggle-slider { background: var(--red); }
+    input:checked + .toggle-slider::before { transform: translateX(18px); }
+    .ap-label { font-size: 14px; font-weight: 700; color: #0F172A; }
+    .ap-sub   { font-size: 12px; color: var(--gray); margin-top: 2px; }
+    .ap-body  { padding: 16px; border-top: 1px solid var(--border); }
+    .cta-preview { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+                   background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 8px;
+                   font-size: 13px; font-weight: 700; color: #065F46; margin-top: 12px; }
+    .cta-preview.required { background: #FFF7ED; border-color: #FED7AA; color: #9A3412; }
+
+    .offer-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+    .offer-toggle-label { font-size: 13px; font-weight: 600; color: #374151; cursor: pointer;
+                          display: flex; align-items: center; gap: 8px; }
+    .offer-fields { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .offer-fields.hidden { display: none; }
+
+    /* ── LOGO UPLOAD ── */
+    .logo-zone { border: 2px dashed var(--border); border-radius: 14px; padding: 22px;
+                 text-align: center; cursor: pointer; transition: all .18s; background: #FAFAFA;
+                 position: relative; }
+    .logo-zone:hover { border-color: var(--blue); background: #EFF6FF; }
+    .logo-zone.has-logo { border-style: solid; border-color: var(--green); background: #F0FDF4; }
+    .logo-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .logo-preview { width: 90px; height: 90px; object-fit: contain; border-radius: 10px;
+                    border: 1px solid var(--border); background: #fff; padding: 4px; }
+    .logo-zone-icon { font-size: 28px; color: var(--gray); margin-bottom: 8px; }
+    .logo-zone-text { font-size: 13px; color: var(--gray); }
+    .logo-zone-text strong { color: var(--blue); }
+    .logo-url-row { margin-top: 12px; }
+
+    /* ── COLOR PALETTE ── */
+    .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 4px; }
+    .pal-card { border: 2px solid var(--border); border-radius: 13px; overflow: hidden;
+                cursor: pointer; transition: all .18s; }
+    .pal-card:hover { border-color: #93C5FD; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+    .pal-card.sel   { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(27,111,239,.2); }
+    .pal-swatch { height: 52px; display: flex; }
+    .pal-dark  { flex: 1; }
+    .pal-light { flex: 1; }
+    .pal-name  { padding: 6px 8px; font-size: 10.5px; font-weight: 700; color: #374151;
+                 text-align: center; line-height: 1.2; background: #F8FAFC; }
+    .custom-colors { margin-top: 14px; padding: 14px 16px; border: 1.5px solid var(--border);
+                     border-radius: 12px; background: #FAFAFA; }
+    .custom-colors-label { font-size: 12px; font-weight: 700; color: var(--gray); margin-bottom: 10px; }
+    .custom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .color-swatch-btn { width: 32px; height: 32px; border-radius: 8px; border: 2px solid var(--border);
+                        cursor: pointer; padding: 0; flex-shrink: 0; }
+    .color-field-wrap { display: flex; align-items: center; gap: 8px; }
+    .color-field-wrap input[type="color"] { width: 36px; height: 36px; padding: 2px; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
+    .color-field-wrap input[type="text"] { padding: 8px 10px; font-size: 13px; font-family: monospace; }
+
+    /* ── GALLERY ── */
+    .gal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+    .gal-card { border: 2px solid var(--border); border-radius: 13px; padding: 14px 12px;
+                cursor: pointer; transition: all .18s; }
+    .gal-card:hover { border-color: var(--blue); }
+    .gal-card.sel  { border-color: var(--blue); background: #EFF6FF; }
+    .gal-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .gal-desc  { font-size: 11.5px; color: var(--gray); line-height: 1.4; }
+
+    .qr-info { background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 10px;
+               padding: 11px 14px; display: flex; align-items: flex-start; gap: 10px; margin-top: 10px; }
+    .qr-icon  { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .qr-lbl   { font-size: 12.5px; font-weight: 700; color: #065F46; }
+    .qr-url   { font-size: 11.5px; color: var(--gray); margin-top: 2px; font-family: monospace; }
+    .qr-url span { color: #1D4ED8; }
+
+    /* ── THEME BAR ── */
+    .theme-bar { display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+                 border: 2px solid var(--border); border-radius: 12px; margin-bottom: 22px; transition: border .3s; }
+    .swatches { display: flex; gap: 6px; }
+    .sw { width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(0,0,0,.08); transition: background .3s; }
+    .theme-name { font-size: 14px; font-weight: 800; color: #0F172A; }
+    .theme-mood { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+    /* ── ASSET GRID ── */
+    .asset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .asset-card { border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 12px;
+                  position: relative; cursor: pointer; transition: all .18s; user-select: none; }
+    .asset-card:hover { border-color: var(--blue); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.09); }
+    .asset-card.selected { border-color: var(--blue); background: #EFF6FF; }
+    .asset-card.unselected { border-color: var(--border); background: #F8FAFC; opacity: .55; }
+    .asset-card.unselected .asset-icon { filter: grayscale(1); }
+    .asset-check { position: absolute; top: 9px; left: 9px; width: 20px; height: 20px;
+                   border-radius: 50%; border: 2px solid #CBD5E1; background: #fff;
+                   display: flex; align-items: center; justify-content: center;
+                   font-size: 11px; transition: all .18s; }
+    .asset-card.selected .asset-check { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .asset-badge { position: absolute; top: 9px; right: 9px; background: var(--amber-lt);
+                   color: #854D0E; font-size: 10px; font-weight: 700; padding: 2px 7px;
+                   border-radius: 20px; border: 1px solid #FDE68A; }
+    .asset-icon { font-size: 20px; margin-bottom: 7px; margin-top: 4px; }
+    .asset-name { font-size: 13px; font-weight: 800; color: #0F172A; margin-bottom: 3px; }
+    .asset-dims { font-size: 11px; color: #6366F1; font-family: monospace; font-weight: 600; margin-bottom: 3px; }
+    .asset-desc { font-size: 11.5px; color: var(--gray); line-height: 1.3; }
+    .asset-sel-controls { display: flex; align-items: center; justify-content: space-between;
+                          margin-bottom: 12px; }
+    .asset-sel-count { font-size: 13px; font-weight: 700; color: #374151; }
+    .asset-sel-count span { color: var(--blue); }
+    .asset-sel-btns { display: flex; gap: 8px; }
+    .sel-btn { font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 8px;
+               border: 1.5px solid var(--border); background: #fff; color: #374151;
+               cursor: pointer; transition: all .15s; }
+    .sel-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* ── GENERATE BTN ── */
+    .gen-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #1B6FEF, #1248B3);
+               color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 800;
+               cursor: pointer; transition: all .2s; display: flex; align-items: center;
+               justify-content: center; gap: 10px; }
+    .gen-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(27,111,239,.38); }
+    .gen-btn.loading { background: #6B7280; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ── OUTPUT ── */
+    .output-section { display: none; }
+    .output-section.show { display: block; }
+
+    .delivery-banner { background: linear-gradient(135deg, #064E3B, #065F46); border-radius: 14px;
+                       padding: 20px 22px; margin-bottom: 20px; color: #fff; display: flex;
+                       align-items: center; gap: 14px; }
+    .delivery-icon { font-size: 28px; flex-shrink: 0; }
+    .delivery-title { font-size: 16px; font-weight: 800; }
+    .delivery-sub   { font-size: 13px; color: rgba(255,255,255,.7); margin-top: 3px; }
+
+    .kit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
+    .kit-card { border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .kit-thumb { width: 100%; aspect-ratio: 16/9; background: #F1F5F9; display: flex;
+                 align-items: center; justify-content: center; font-size: 24px; border-bottom: 1px solid var(--border); }
+    .kit-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .kit-info { padding: 10px 12px; }
+    .kit-name  { font-size: 12.5px; font-weight: 800; color: #0F172A; margin-bottom: 4px; }
+    .kit-dims  { font-size: 10.5px; color: #6366F1; font-family: monospace; font-weight: 600; }
+    .kit-links { display: flex; gap: 6px; margin-top: 8px; }
+    .kit-link  { flex: 1; text-align: center; padding: 5px 0; border-radius: 6px; font-size: 11px;
+                 font-weight: 700; text-decoration: none; cursor: pointer; border: 1.5px solid; }
+    .kit-link.edit   { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+    .kit-link.view   { background: #F0FDF4; color: #065F46; border-color: #86EFAC; }
+
+    .post-suggest { background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: 12px;
+                    padding: 14px 16px; margin-bottom: 12px; }
+    .post-suggest-title { font-size: 13.5px; font-weight: 800; color: #92400E; margin-bottom: 8px; }
+    .suggest-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 5px; }
+    .suggest-dot { width: 6px; height: 6px; background: var(--amber); border-radius: 50%;
+                   flex-shrink: 0; margin-top: 6px; }
+    .suggest-text { font-size: 12.5px; color: #78350F; line-height: 1.45; }
+
+    .pdf-btn { width: 100%; padding: 14px; background: var(--navy); color: #fff;
+               border: none; border-radius: 12px; font-size: 14px; font-weight: 800;
+               cursor: pointer; display: flex; align-items: center; justify-content: center;
+               gap: 8px; transition: background .18s; margin-top: 18px; }
+    .pdf-btn:hover { background: #1E293B; }
+
+    /* ── UTILS ── */
+    .hidden { display: none !important; }
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+    .tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
+           border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .tag.blue  { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+    .tag.green { background: #F0FDF4; color: #065F46; border: 1px solid #86EFAC; }
+    .tag.red   { background: #FFF1F2; color: #9F1239; border: 1px solid #FECDD3; }
+
+    .spin { display: inline-block; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 700px) {
+      .jt-grid, .palette-grid { grid-template-columns: repeat(3, 1fr); }
+      .asset-grid, .kit-grid  { grid-template-columns: repeat(2, 1fr); }
+      .gal-grid, .row, .row3  { grid-template-columns: 1fr; }
+      .hdr, .how-to            { padding: 14px 18px; }
+      .wrap                    { padding: 0 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-logo">📸</div>
+  <div>
+    <h1>Picture Day Asset Generator</h1>
+    <p>Logo · Colors · AdvancePay · Generate marketing assets instantly in your browser</p>
+  </div>
+  <div class="hdr-badge">PhotoDay</div>
+</div>
+<div class="how-to">
+  <span>💡</span>
+  <span><strong>How to use:</strong> Fill out all 4 steps, choose which assets to create → click Generate → your PNG assets are created instantly in your browser — no account needed.</span>
+</div>
+
+<div class="wrap">
+
+  <!-- ── STEP 1: JOB DETAILS ── -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="step-dot">1</div>
+      <div><div class="card-title">Job Details</div>
+           <div class="card-sub">Name, date, job type, and AdvancePay settings</div></div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="job-name">Job Name</label>
+        <input type="text" id="job-name" placeholder="e.g. Lincoln Elementary Spring 2026" />
+      </div>
+      <div class="field">
+        <label for="job-date">Picture Day Date</label>
+        <input type="date" id="job-date" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Job Type</label>
+      <div class="jt-grid" id="jt-grid"></div>
+    </div>
+
+    <!-- ADVANCEPAY -->
+    <div class="ap-box" style="margin-top:20px">
+      <label class="ap-toggle-row" for="ap-required">
+        <span class="toggle-wrap">
+          <input type="checkbox" id="ap-required" onchange="toggleAP()" />
+          <span class="toggle-slider"></span>
+        </span>
+        <div>
+          <div class="ap-label">AdvancePay (AP) Required</div>
+          <div class="ap-sub">When ON — all CTAs change to "REGISTER FOR PICTURE DAY"</div>
+        </div>
+      </label>
+      <div class="ap-body" id="ap-body">
+        <!-- Offer section (only shown when AP NOT required) -->
+        <div id="offer-wrap">
+          <label class="offer-toggle-label" for="has-offer">
+            <input type="checkbox" id="has-offer" onchange="toggleOffer()" />
+            Attach an AdvancePay offer (e.g. "Buy now, save later")
+          </label>
+          <div class="offer-fields hidden" id="offer-fields">
+            <div class="field">
+              <label>Offer Amount</label>
+              <input type="text" id="offer-amount" placeholder="e.g. 20% OFF or $5 Off" />
+            </div>
+            <div class="field">
+              <label>Offer Expires</label>
+              <input type="date" id="offer-expiry" />
+            </div>
+          </div>
+        </div>
+        <div id="cta-preview-wrap">
+          <!-- updated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: BRANDING ── -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="step-dot">2</div>
+      <div><div class="card-title">Branding</div>
+           <div class="card-sub">Upload your logo and choose team / school colors</div></div>
+    </div>
+
+    <div class="row">
+      <!-- LOGO -->
+      <div>
+        <label>Logo</label>
+        <div class="logo-zone" id="logo-zone" onclick="document.getElementById('logo-file').click()">
+          <input type="file" id="logo-file" accept="image/*" style="display:none" onchange="handleLogoFile(this)" />
+          <div id="logo-placeholder">
+            <div class="logo-zone-icon">🖼️</div>
+            <div class="logo-zone-text"><strong>Click to upload</strong> or drag &amp; drop<br>PNG, JPG, SVG — transparent background preferred</div>
+          </div>
+          <img id="logo-img" class="logo-preview hidden" src="" alt="Logo preview" onclick="event.stopPropagation()" />
+        </div>
+        <div class="logo-url-row">
+          <div class="field">
+            <label for="logo-url">Logo URL (Google Drive / web link)</label>
+            <input type="url" id="logo-url" placeholder="https://drive.google.com/..." oninput="updateLogoUrl()" />
+          </div>
+        </div>
+        <div id="logo-status" style="font-size:12px;color:var(--gray);margin-top:6px;"></div>
+      </div>
+
+      <!-- COLOR PALETTE -->
+      <div>
+        <label>Team / School Colors</label>
+        <div class="palette-grid" id="palette-grid"></div>
+        <!-- Custom colors -->
+        <div class="custom-colors" id="custom-colors-wrap" style="display:none">
+          <div class="custom-colors-label">Custom Colors</div>
+          <div class="custom-row">
+            <div class="field">
+              <label>Primary (Dark)</label>
+              <div class="color-field-wrap">
+                <input type="color" id="custom-dark" value="#1A3A6B" oninput="syncCustomColor('dark')" />
+                <input type="text" id="custom-dark-hex" value="#1A3A6B" maxlength="7"
+                       oninput="syncCustomHex('dark')" style="font-family:monospace;" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Secondary (Light)</label>
+              <div class="color-field-wrap">
+                <input type="color" id="custom-light" value="#F97316" oninput="syncCustomColor('light')" />
+                <input type="text" id="custom-light-hex" value="#F97316" maxlength="7"
+                       oninput="syncCustomHex('light')" style="font-family:monospace;" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: GALLERY ── -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="step-dot">3</div>
+      <div><div class="card-title">Gallery Setup</div>
+           <div class="card-sub">Determines QR codes, access codes, and gallery lookup text</div></div>
+    </div>
+    <div class="gal-grid">
+      <div class="gal-card" data-type="public"  onclick="pickGallery('public')">
+        <div class="gal-title">🌐 Public</div>
+        <div class="gal-desc">Open gallery — anyone with the access code can view photos.</div>
+      </div>
+      <div class="gal-card" data-type="group"   onclick="pickGallery('group')">
+        <div class="gal-title">👥 Group</div>
+        <div class="gal-desc">Single code + FaceFind. Parents auto-find their photos.</div>
+      </div>
+      <div class="gal-card" data-type="private" onclick="pickGallery('private')">
+        <div class="gal-title">🔒 Private</div>
+        <div class="gal-desc">Each subject gets a unique link. Gallery URL required.</div>
+      </div>
+    </div>
+
+    <div id="ac-wrap" class="hidden">
+      <div class="field">
+        <label for="access-code">Access Code</label>
+        <input type="text" id="access-code" maxlength="20" placeholder="e.g. LINCOLN26"
+               oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,''); refreshQR()" />
+      </div>
+      <div class="qr-info">
+        <div class="qr-icon">📲</div>
+        <div>
+          <div class="qr-lbl">QR Code added to Email/Flyer Banner (bottom-right corner)</div>
+          <div class="qr-url">Target: <span id="qr-val">smsto:90738:—</span></div>
+          <div class="qr-url" style="margin-top:2px">Parents text access code to <strong>90738</strong> or visit <strong>my.photoday.io</strong></div>
+        </div>
+      </div>
+    </div>
+    <div id="url-wrap" class="hidden">
+      <div class="field">
+        <label for="gallery-url">Gallery URL</label>
+        <input type="url" id="gallery-url" placeholder="https://gallery.photoday.io/..." />
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 4: PREVIEW ── -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="step-dot">4</div>
+      <div><div class="card-title">Select Assets</div>
+           <div class="card-sub">Choose which assets to generate — click any card to toggle selection</div></div>
+    </div>
+
+    <div class="theme-bar" id="theme-bar">
+      <div class="swatches">
+        <div class="sw" id="sw1" style="background:#E5E7EB"></div>
+        <div class="sw" id="sw2" style="background:#E5E7EB"></div>
+      </div>
+      <div id="logo-thumb-wrap" class="hidden">
+        <img id="logo-thumb" style="width:36px;height:36px;object-fit:contain;border-radius:6px;border:1px solid var(--border);" />
+      </div>
+      <div>
+        <div class="theme-name" id="theme-nm">Select job type + colors above</div>
+        <div class="theme-mood" id="theme-md"></div>
+      </div>
+      <div id="ap-tag-wrap" style="margin-left:auto"></div>
+    </div>
+
+    <div class="asset-grid" id="asset-grid"></div>
+  </div>
+
+  <!-- ── GENERATE ── -->
+  <div class="card">
+    <button class="gen-btn" id="gen-btn" onclick="generate()">
+      <span>✨</span> <span id="gen-btn-label">Generate 6 Assets in Canva</span>
+    </button>
+    <div style="margin-top:14px;padding:12px 14px;background:#FFFBEB;border:1.5px solid #FDE68A;
+                border-radius:10px;font-size:12.5px;color:#92400E;line-height:1.55;">
+      <strong>What happens when you click Generate:</strong> Your selected assets are created
+      <strong>instantly in your browser</strong> using your colors, logo, and job details.
+      Download each one as a PNG — ready to use right away in emails, social posts, websites, and print.
+    </div>
+  </div>
+
+  <!-- ── OUTPUT ── -->
+  <div class="card output-section" id="out-section">
+    <div class="card-hdr">
+      <div class="step-dot green">✓</div>
+      <div><div class="card-title">Your Assets Are Ready</div>
+           <div class="card-sub">Download each asset below — generated in your browser, no account needed</div></div>
+    </div>
+    <div id="assets-output"></div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+/* ══════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════ */
+const THEMES = {
+  all:          { lbl:'All',          emoji:'📸', p:'#1B6FEF', s:'#64748B', mood:'Universal — works for any picture day job' },
+  'youth-sports':{ lbl:'Youth Sports', emoji:'⚽', p:'#1A3A6B', s:'#F97316', mood:'Bold, energetic, team-spirited, young athletes' },
+  'hs-sports':  { lbl:'HS Sports',    emoji:'🏆', p:'#7C1D26', s:'#C9A227', mood:'School pride, varsity energy, competitive' },
+  dance:        { lbl:'Dance',        emoji:'🩰', p:'#6B21A8', s:'#EC4899', mood:'Elegant, graceful, artistic, performance' },
+  preschool:    { lbl:'Preschool',    emoji:'🎨', p:'#15803D', s:'#FACC15', mood:'Bright, playful, colorful, fun, welcoming' },
+  elementary:   { lbl:'Elementary',   emoji:'🍎', p:'#1D4ED8', s:'#FBBF24', mood:'Friendly, bright school spirit, approachable' },
+  underclass:   { lbl:'Underclass',   emoji:'📚', p:'#1E40AF', s:'#6B7280', mood:'Clean, professional, classic school portrait' },
+  seniors:      { lbl:'Seniors',      emoji:'🎓', p:'#1C1917', s:'#D97706', mood:'Sophisticated, milestone, elegant, timeless' },
+  graduation:   { lbl:'Graduation',   emoji:'🎓', p:'#0F172A', s:'#D4AF37', mood:'Formal, celebratory, proud achievement' },
+  events:       { lbl:'Events',       emoji:'🎉', p:'#0E7490', s:'#F97316', mood:'Vibrant, exciting, memorable, dynamic' },
+  other:        { lbl:'Other',        emoji:'✨', p:'#4F46E5', s:'#0EA5E9', mood:'Professional, versatile, high-quality' }
+};
+
+const PALETTE = [
+  { name:'Navy & Gold',    dark:'#0F2D5A', light:'#D97706' },
+  { name:'Royal Blue',     dark:'#1E3A8A', light:'#60A5FA' },
+  { name:'Crimson',        dark:'#7C0A02', light:'#DC2626' },
+  { name:'Maroon & Gold',  dark:'#7C1D26', light:'#C9A227' },
+  { name:'Forest Green',   dark:'#14532D', light:'#16A34A' },
+  { name:'Emerald & White',dark:'#064E3B', light:'#34D399' },
+  { name:'Purple',         dark:'#4C1D95', light:'#9333EA' },
+  { name:'Purple & Gold',  dark:'#6B21A8', light:'#D97706' },
+  { name:'Orange & Navy',  dark:'#1A3A6B', light:'#F97316' },
+  { name:'Red & Black',    dark:'#1C1917', light:'#EF4444' },
+  { name:'Black & Gold',   dark:'#0F172A', light:'#D4AF37' },
+  { name:'Teal & White',   dark:'#134E4A', light:'#14B8A6' },
+  { name:'Silver & Blue',  dark:'#1E40AF', light:'#94A3B8' },
+  { name:'Pink & Black',   dark:'#1C1917', light:'#EC4899' },
+  { name:'⚙ Custom',       dark:null,      light:null,       custom:true }
+];
+
+const ASSETS = [
+  { icon:'📧', name:'Email / Flyer Banner',   dims:'1200 × 545 px',   desc:'Email campaigns & digital flyers', qr:true },
+  { icon:'📱', name:'Vertical Web Banner',    dims:'300 × 600 px',    desc:'School website sidebars' },
+  { icon:'🖥️', name:'Horizontal Web Banner', dims:'728 × 90 px',     desc:'Website headers & footers' },
+  { icon:'📲', name:'4:5 Social Graphic',     dims:'1080 × 1350 px',  desc:'Instagram & Facebook posts' },
+  { icon:'🖼️', name:'Reminder Cards',         dims:'3.5" × 5"',       desc:'Printable cards with gallery lookup' },
+  { icon:'📋', name:'Picture Day Poster',     dims:'20" × 30"',       desc:'"Picture Day is Coming" poster with gallery info' }
+];
+
+const POST_SUGGESTIONS = [
+  { who:'📧 Email blast + digital flyer',
+    tips:['Send 3 weeks before picture day to all families','Resend 1 week before as a reminder','Send day-of as a final reminder — include direct gallery link'] },
+  { who:'📱 School website sidebar',
+    tips:['Post 4 weeks out — keep live until 1 week after picture day','Link banner directly to gallery or registration page'] },
+  { who:'🖥️ Website header / digital signage',
+    tips:['Add to school website header 3 weeks out','Display on lobby screens / marquee signs the week of picture day'] },
+  { who:'📲 Instagram & Facebook',
+    tips:['Post 3 weeks, 1 week, and 3 days before picture day','Share in parent Facebook groups and school community pages','Use Stories format for extra reach day-of'] },
+  { who:'🖼️ Print & distribute reminder cards',
+    tips:['Send home with students 1–2 weeks before','Ideal for teacher distribution with take-home folders','Include access code or QR code on the card'] },
+  { who:'📋 Hallway & bulletin board posters',
+    tips:['Print and hang 3–4 weeks before picture day','Place at main entrance, cafeteria, and hallways','Replace with "Picture Day is TODAY!" version on the day'] }
+];
+
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+let selJobType = null, selGallery = null, selPalIdx = null;
+let logoBase64 = null, logoUrl = null;
+let customColors = { dark: '#1A3A6B', light: '#F97316' };
+let selAssets = new Set([0, 1, 2, 3, 4, 5]); // all selected by default
+let _genCommand = '';
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+function init() {
+  // Job type grid
+  const jg = document.getElementById('jt-grid');
+  jg.innerHTML = Object.entries(THEMES).map(([id,t]) =>
+    `<div class="jt-card" id="jt-${id}" onclick="pickJobType('${id}')">
+       <span class="jt-emoji">${t.emoji}</span>
+       <span class="jt-lbl">${t.lbl}</span>
+     </div>`).join('');
+
+  // Palette grid
+  const pg = document.getElementById('palette-grid');
+  pg.innerHTML = PALETTE.map((p,i) => {
+    const darkBg  = p.dark  || '#1A3A6B';
+    const lightBg = p.light || '#F97316';
+    return `<div class="pal-card" id="pal-${i}" onclick="pickPalette(${i})">
+      <div class="pal-swatch">
+        <div class="pal-dark"  style="background:${darkBg}"></div>
+        <div class="pal-light" style="background:${lightBg}"></div>
+      </div>
+      <div class="pal-name">${p.name}</div>
+    </div>`;
+  }).join('');
+
+  buildAssetGrid();
+  refreshCTAPreview();
+}
+
+/* ══════════════════════════════════════════════
+   JOB TYPE
+══════════════════════════════════════════════ */
+function pickJobType(id) {
+  selJobType = id;
+  document.querySelectorAll('.jt-card').forEach(e => e.classList.remove('sel'));
+  document.getElementById('jt-' + id).classList.add('sel');
+  updateThemeBar();
+  buildAssetGrid();
+}
+
+/* ══════════════════════════════════════════════
+   PALETTE
+══════════════════════════════════════════════ */
+function pickPalette(i) {
+  selPalIdx = i;
+  document.querySelectorAll('.pal-card').forEach(e => e.classList.remove('sel'));
+  document.getElementById('pal-' + i).classList.add('sel');
+  const isCustom = !!PALETTE[i].custom;
+  document.getElementById('custom-colors-wrap').style.display = isCustom ? 'block' : 'none';
+  updateThemeBar();
+}
+
+function syncCustomColor(which) {
+  const val = document.getElementById('custom-' + which).value;
+  document.getElementById('custom-' + which + '-hex').value = val;
+  customColors[which] = val;
+  updateThemeBar();
+}
+function syncCustomHex(which) {
+  let val = document.getElementById('custom-' + which + '-hex').value;
+  if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+    document.getElementById('custom-' + which).value = val;
+    customColors[which] = val;
+    updateThemeBar();
+  }
+}
+
+function getEffectiveColors() {
+  if (selPalIdx !== null) {
+    const p = PALETTE[selPalIdx];
+    if (p.custom) return { dark: customColors.dark, light: customColors.light };
+    return { dark: p.dark, light: p.light };
+  }
+  if (selJobType) {
+    const t = THEMES[selJobType];
+    return { dark: t.p, light: t.s };
+  }
+  return { dark: '#E5E7EB', light: '#E5E7EB' };
+}
+
+/* ══════════════════════════════════════════════
+   THEME BAR
+══════════════════════════════════════════════ */
+function updateThemeBar() {
+  const c = getEffectiveColors();
+  document.getElementById('sw1').style.background = c.dark;
+  document.getElementById('sw2').style.background = c.light;
+  document.getElementById('theme-bar').style.borderColor = c.dark + '88';
+
+  let nm = 'Select job type + colors above', md = '';
+  if (selJobType) {
+    const t = THEMES[selJobType];
+    nm = t.lbl + ' Theme'; md = t.mood;
+    if (selPalIdx !== null && !PALETTE[selPalIdx].custom) {
+      nm += ' · ' + PALETTE[selPalIdx].name + ' colors';
+    } else if (selPalIdx !== null && PALETTE[selPalIdx].custom) {
+      nm += ' · Custom colors';
+    }
+  }
+  document.getElementById('theme-nm').textContent = nm;
+  document.getElementById('theme-md').textContent = md;
+
+  // Logo thumb
+  if (logoBase64 || logoUrl) {
+    const thumb = document.getElementById('logo-thumb');
+    thumb.src = logoBase64 || logoUrl;
+    document.getElementById('logo-thumb-wrap').classList.remove('hidden');
+  }
+
+  // AP tag
+  const apReq = document.getElementById('ap-required').checked;
+  const apTag = document.getElementById('ap-tag-wrap');
+  apTag.innerHTML = apReq
+    ? '<span class="tag red">🔴 AP Required — Register</span>'
+    : (document.getElementById('has-offer') && document.getElementById('has-offer').checked
+        ? `<span class="tag green">💰 AP Offer: ${document.getElementById('offer-amount').value || '—'}</span>`
+        : '');
+}
+
+/* ══════════════════════════════════════════════
+   LOGO
+══════════════════════════════════════════════ */
+function handleLogoFile(inp) {
+  const file = inp.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    logoBase64 = e.target.result;
+    const img = document.getElementById('logo-img');
+    img.src = logoBase64;
+    img.classList.remove('hidden');
+    document.getElementById('logo-placeholder').style.display = 'none';
+    document.getElementById('logo-zone').classList.add('has-logo');
+    document.getElementById('logo-status').textContent = '✓ Logo uploaded: ' + file.name;
+    updateThemeBar();
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateLogoUrl() {
+  const u = document.getElementById('logo-url').value.trim();
+  logoUrl = u || null;
+  if (u) {
+    document.getElementById('logo-status').textContent = '✓ Logo URL saved';
+    updateThemeBar();
+  }
+}
+
+/* ══════════════════════════════════════════════
+   GALLERY
+══════════════════════════════════════════════ */
+function pickGallery(type) {
+  selGallery = type;
+  document.querySelectorAll('.gal-card').forEach(e => e.classList.remove('sel'));
+  document.querySelector(`.gal-card[data-type="${type}"]`).classList.add('sel');
+  const isPG = type === 'public' || type === 'group';
+  document.getElementById('ac-wrap').classList.toggle('hidden', !isPG);
+  document.getElementById('url-wrap').classList.toggle('hidden', type !== 'private');
+  refreshQR();
+  buildAssetGrid();
+}
+
+function refreshQR() {
+  const code = document.getElementById('access-code').value || '—';
+  document.getElementById('qr-val').textContent = 'smsto:90738:' + code;
+}
+
+/* ══════════════════════════════════════════════
+   ADVANCEPAY
+══════════════════════════════════════════════ */
+function toggleAP() {
+  const req = document.getElementById('ap-required').checked;
+  document.getElementById('offer-wrap').classList.toggle('hidden', req);
+  refreshCTAPreview();
+  updateThemeBar();
+}
+
+function toggleOffer() {
+  const on = document.getElementById('has-offer').checked;
+  document.getElementById('offer-fields').classList.toggle('hidden', !on);
+  refreshCTAPreview();
+  updateThemeBar();
+}
+
+function refreshCTAPreview() {
+  const req    = document.getElementById('ap-required').checked;
+  const hasOff = !req && document.getElementById('has-offer') && document.getElementById('has-offer').checked;
+  const amt    = hasOff ? (document.getElementById('offer-amount').value || 'X% OFF') : '';
+  let cta, cls;
+  if (req) {
+    cta = '🔴 Button CTA → "REGISTER FOR PICTURE DAY"';
+    cls = 'cta-preview required';
+  } else if (hasOff) {
+    cta = `💰 Button CTA → "Buy Now, Save Later! ${amt}"`;
+    cls = 'cta-preview';
+  } else {
+    cta = '✅ Button CTA → "Order Photos Online"';
+    cls = 'cta-preview';
+  }
+  document.getElementById('cta-preview-wrap').innerHTML = `<div class="${cls}">${cta}</div>`;
+}
+
+/* ══════════════════════════════════════════════
+   ASSET GRID
+══════════════════════════════════════════════ */
+function buildAssetGrid() {
+  const isQR = selGallery === 'public' || selGallery === 'group';
+  const controls = `
+    <div class="asset-sel-controls">
+      <div class="asset-sel-count"><span id="sel-count">${selAssets.size}</span> of ${ASSETS.length} assets selected</div>
+      <div class="asset-sel-btns">
+        <button class="sel-btn" onclick="selectAllAssets()">Select All</button>
+        <button class="sel-btn" onclick="deselectAllAssets()">None</button>
+      </div>
+    </div>`;
+  const cards = ASSETS.map((a, i) => {
+    const isSel = selAssets.has(i);
+    const cls = isSel ? 'selected' : 'unselected';
+    return `<div class="asset-card ${cls}" onclick="toggleAsset(${i})" id="asset-card-${i}">
+       <div class="asset-check">${isSel ? '✓' : ''}</div>
+       ${a.qr && isQR ? '<div class="asset-badge">+ QR Code</div>' : ''}
+       <div class="asset-icon">${a.icon}</div>
+       <div class="asset-name">${a.name}</div>
+       <div class="asset-dims">${a.dims}</div>
+       <div class="asset-desc">${a.desc}</div>
+     </div>`;
+  }).join('');
+  document.getElementById('asset-grid').innerHTML = controls + `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">${cards}</div>`;
+}
+
+function toggleAsset(i) {
+  if (selAssets.has(i)) {
+    if (selAssets.size === 1) return; // keep at least one
+    selAssets.delete(i);
+  } else {
+    selAssets.add(i);
+  }
+  buildAssetGrid();
+  updateGenBtn();
+}
+
+function selectAllAssets() {
+  ASSETS.forEach((_, i) => selAssets.add(i));
+  buildAssetGrid();
+  updateGenBtn();
+}
+
+function deselectAllAssets() {
+  selAssets.clear();
+  selAssets.add(0); // keep at least one
+  buildAssetGrid();
+  updateGenBtn();
+}
+
+function updateGenBtn() {
+  const n = selAssets.size;
+  const lbl = document.getElementById('gen-btn-label');
+  if (lbl) lbl.textContent = `Generate ${n} Asset${n !== 1 ? 's' : ''} in Canva`;
+}
+
+/* ══════════════════════════════════════════════
+   CANVAS HELPERS
+══════════════════════════════════════════════ */
+function hexToRgba(hex, a) {
+  a = a === undefined ? 1 : a;
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return 'rgba('+r+','+g+','+b+','+a+')';
+}
+function luma(hex) {
+  const r=parseInt(hex.slice(1,3),16)/255, g=parseInt(hex.slice(3,5),16)/255, b=parseInt(hex.slice(5,7),16)/255;
+  return 0.2126*r+0.7152*g+0.0722*b;
+}
+function onColor(hex) { return luma(hex)<0.5?'#FFFFFF':'#1E293B'; }
+
+function rrect(ctx, x, y, w, h, r, fill) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+  ctx.fillStyle=fill; ctx.fill();
+}
+function ctxBtn(ctx, text, x, y, w, h, bg, fg, fs, r) {
+  r = r||8;
+  rrect(ctx,x,y,w,h,r,bg);
+  ctx.font='800 '+fs+'px Arial,sans-serif';
+  ctx.fillStyle=fg; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(text,x+w/2,y+h/2,w-16); ctx.textBaseline='alphabetic';
+}
+function drawLogo(ctx, img, x, y, size, accent) {
+  if (img) {
+    const ratio=img.width/img.height, lw=ratio>=1?size:size*ratio, lh=ratio>=1?size/ratio:size;
+    ctx.drawImage(img, x+(size-lw)/2, y+(size-lh)/2, lw, lh);
+  } else {
+    rrect(ctx,x,y,size,size,size*0.18,hexToRgba(accent,0.25));
+    ctx.font=(size*0.62)+'px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('📸',x+size/2,y+size/2+2); ctx.textBaseline='alphabetic';
+  }
+}
+async function loadImg(url) {
+  if (!url) return null;
+  return new Promise(function(resolve) {
+    const img=new Image(); img.crossOrigin='anonymous';
+    img.onload=function(){resolve(img);}; img.onerror=function(){resolve(null);};
+    setTimeout(function(){resolve(null);},4000); img.src=url;
+  });
+}
+
+/* ── RENDERERS ── */
+function drawEmailBanner(ctx, W, H, cfg, logo) {
+  const {primary:p,secondary:s,jobName,date,cta,lookupText}=cfg;
+  const tp=onColor(p),ts=onColor(s),PAD=W*0.05;
+  ctx.fillStyle=p; ctx.fillRect(0,0,W,H);
+  rrect(ctx,W*0.6,H*0.08,W*0.36,H*0.79,20,hexToRgba(s,0.14));
+  ctx.beginPath(); ctx.arc(W*0.79,H*0.4,H*0.38,0,Math.PI*2);
+  ctx.fillStyle=hexToRgba(s,0.1); ctx.fill();
+  ctx.fillStyle=s; ctx.fillRect(0,H*0.84,W,H*0.16);
+  drawLogo(ctx,logo,PAD,H*0.07,H*0.19,s);
+  ctx.font='700 '+(H*0.072)+'px Arial,sans-serif';
+  ctx.fillStyle=hexToRgba(tp,0.8); ctx.textAlign='left';
+  ctx.fillText(jobName,PAD,H*0.37,W*0.54);
+  ctx.font='900 '+(H*0.158)+'px "Arial Black",Arial,sans-serif';
+  ctx.fillStyle=tp; ctx.fillText('PICTURE',PAD,H*0.525);
+  ctx.fillText('DAY!',PAD,H*0.7);
+  ctx.font='700 '+(H*0.063)+'px Arial,sans-serif';
+  ctx.fillStyle=s; ctx.fillText(date,PAD,H*0.81);
+  const bw=W*0.3,bh=H*0.13,bx=W*0.62+(W*0.34-bw)/2,by=H*0.265;
+  ctxBtn(ctx,cta,bx,by,bw,bh,s,ts,H*0.048,10);
+  ctx.font='500 '+(H*0.05)+'px Arial,sans-serif';
+  ctx.fillStyle=hexToRgba(tp,0.62); ctx.textAlign='center';
+  ctx.fillText('Find & order your photos online',W*0.79,H*0.515,W*0.35);
+  ctx.font='700 '+(H*0.054)+'px Arial,sans-serif';
+  ctx.fillStyle=ts; ctx.textAlign='center';
+  ctx.fillText(lookupText,W/2,H*0.925,W-PAD*2);
+}
+function drawVerticalBanner(ctx, W, H, cfg, logo) {
+  const {primary:p,secondary:s,jobName,date,cta,lookupText}=cfg;
+  const tp=onColor(p),ts=onColor(s),PAD=W*0.08;
+  ctx.fillStyle=p; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=s; ctx.fillRect(0,0,W,H*0.112);
+  ctx.font='700 '+(H*0.031)+'px Arial,sans-serif';
+  ctx.fillStyle=ts; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(jobName,W/2,H*0.056,W-PAD*2); ctx.textBaseline='alphabetic';
+  ctx.beginPath(); ctx.arc(W/2,H*0.35,W*0.33,0,Math.PI*2);
+  ctx.fillStyle=hexToRgba(s,0.13); ctx.fill();
+  const ls=W*0.3; drawLogo(ctx,logo,(W-ls)/2,H*0.2,ls,s);
+  ctx.font='900 '+(H*0.088)+'px "Arial Black",Arial,sans-serif';
+  ctx.fillStyle=tp; ctx.textAlign='center';
+  ctx.fillText('PICTURE',W/2,H*0.518); ctx.fillText('DAY!',W/2,H*0.613);
+  ctx.font='700 '+(H*0.044)+'px Arial,sans-serif';
+  ctx.fillStyle=s; ctx.fillText(date,W/2,H*0.683);
+  ctx.strokeStyle=hexToRgba(tp,0.18); ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(PAD*2,H*0.72); ctx.lineTo(W-PAD*2,H*0.72); ctx.stroke();
+  ctxBtn(ctx,cta,PAD,H*0.745,W-PAD*2,H*0.088,s,ts,H*0.033,8);
+  ctx.font='500 '+(H*0.03)+'px Arial,sans-serif';
+  ctx.fillStyle=hexToRgba(tp,0.6); ctx.textAlign='center';
+  ctx.fillText(lookupText,W/2,H*0.875,W-PAD*2);
+  ctx.fillText('my.photoday.io',W/2,H*0.918,W-PAD*2);
+}
+function drawHorizontalBanner(ctx, W, H, cfg, logo) {
+  const {primary:p,secondary:s,jobName,date,cta}=cfg;
+  const tp=onColor(p),ts=onColor(s),U=H;
+  ctx.fillStyle=p; ctx.fillRect(0,0,W,H);
+  const ctaW=U*3.2; ctx.fillStyle=s; ctx.fillRect(W-ctaW,0,ctaW,H);
+  const ls=U*0.72; drawLogo(ctx,logo,U*0.14,(H-ls)/2,ls,s);
+  ctx.font='700 '+(U*0.28)+'px Arial,sans-serif';
+  ctx.fillStyle=hexToRgba(tp,0.85); ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText(jobName,U*1.08,H/2,U*2.8);
+  ctx.fillStyle=hexToRgba(tp,0.2); ctx.fillRect(U*4.1,H*0.18,1.5,H*0.64);
+  const cx=U*4.1+(W-ctaW-U*4.1)/2;
+  ctx.font='900 '+(U*0.38)+'px "Arial Black",Arial,sans-serif';
+  ctx.fillStyle=tp; ctx.textAlign='center';
+  ctx.fillText('PICTURE DAY!',cx,H/2-U*0.04,W-ctaW-U*4.8);
+  ctx.font='500 '+(U*0.25)+'px Arial,sans-serif';
+  ctx.fillStyle=hexToRgba(tp,0.65);
+  ctx.fillText(date,cx,H/2+U*0.31,W-ctaW-U*4.8);
+  ctx.textBaseline='alphabetic';
+  ctx.font='800 '+(U*0.28)+'px Arial,sans-serif';
+  ctx.fillStyle=ts; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(cta,W-ctaW/2,H/2,ctaW-U*0.3); ctx.textBaseline='alphabetic';
+}
+function drawSocialGraphic(ctx, W, H, cfg, logo) {
+  const {primary:p,secondary:s,jobName,date,cta,lookupText}=cfg;
+  const tp=onColor(p),ts=onColor(s),PAD=W*0.08;
+  ctx.fillStyle=p; ctx.fillRect(0,0,W,H);
+  ctx.beginPath(); ctx.arc(W*1.1,H*0.18,W*0.72,0,Math.PI*2);
+  ctx.fillStyle=hexToRgba(s,0.1); ctx.fill();
+  ctx.beginPath(); ctx.arc(-W*0.1,H*0.78,W*0.5,0,Math.PI*2);
+  ctx.fillStyle=hexToRgba(s,0.07); ctx.fill();
+  ctx.fillStyle=s; ctx.fillRect(0,0,W,H*0.076); ctx.fillRect(0,H*0.924,W,H*0.076);
+  ctx.font='700 '+(H*0.029)+'px Arial,sans-serif';
+  ctx.fillStyle=ts; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(jobName,W/2,H*0.038,W-PAD*2);
+  ctx.fillText(lookupText,W/2,H*0.962,W-PAD*2); ctx.textBaseline='alphabetic';
+  const ls=W*0.22; drawLogo(ctx,logo,(W-ls)/2,H*0.1,ls,s);
+  ctx.font='900 '+(H*0.125)+'px "Arial Black",Arial,sans-serif';
+  ctx.fillStyle=tp; ctx.textAlign='center';
+  ctx.fillText('PICTURE',W/2,H*0.418);
+  ctx.fillStyle=s; ctx.fillText('DAY!',W/2,H*0.548);
+  ctx.font='600 '+(H*0.036)+'px Arial,sans-serif';
+  ctx.fillStyle=hexToRgba(tp,0.7); ctx.fillText('MARK YOUR CALENDAR',W/2,H*0.618);
+  ctx.strokeStyle=hexToRgba(tp,0.2); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(PAD*2,H*0.645); ctx.lineTo(W-PAD*2,H*0.645); ctx.stroke();
+  ctx.font='700 '+(H*0.06)+'px Arial,sans-serif';
+  ctx.fillStyle=s; ctx.textAlign='center'; ctx.fillText(date,W/2,H*0.728);
+  const bw=W*0.72,bh=H*0.076;
+  ctxBtn(ctx,cta,(W-bw)/2,H*0.645+H*0.086,bw,bh,s,ts,H*0.027,10);
+}
+function drawReminderCard(ctx, W, H, cfg, logo) {
+  const {primary:p,secondary:s,jobName,date,cta,lookupText}=cfg;
+  const tp=onColor(p),ts=onColor(s),PAD=W*0.08;
+  ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=p; ctx.fillRect(0,0,W,H*0.2);
+  const ls=H*0.1; drawLogo(ctx,logo,PAD,(H*0.2-ls)/2,ls,s);
+  ctx.font='700 '+(H*0.04)+'px Arial,sans-serif';
+  ctx.fillStyle=tp; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(jobName,W/2,H*0.1,W-PAD*2-ls-8); ctx.textBaseline='alphabetic';
+  ctx.font=(H*0.1)+'px serif'; ctx.textAlign='center'; ctx.fillText('📸',W/2,H*0.31);
+  ctx.font='900 '+(H*0.08)+'px "Arial Black",Arial,sans-serif';
+  ctx.fillStyle=p; ctx.textAlign='center'; ctx.fillText('PICTURE DAY',W/2,H*0.41);
+  ctx.font='700 '+(H*0.052)+'px Arial,sans-serif';
+  ctx.fillStyle='#1E293B'; ctx.fillText(date,W/2,H*0.49);
+  ctx.fillStyle=s; ctx.fillRect(PAD*3,H*0.52,W-PAD*6,4);
+  const bw=W*0.76,bh=H*0.082;
+  ctxBtn(ctx,cta,(W-bw)/2,H*0.554,bw,bh,p,tp,H*0.029,10);
+  rrect(ctx,PAD,H*0.675,W-PAD*2,H*0.165,12,'#F1F5F9');
+  ctx.font='700 '+(H*0.029)+'px Arial,sans-serif';
+  ctx.fillStyle='#374151'; ctx.textAlign='center'; ctx.fillText('HOW TO FIND YOUR PHOTOS',W/2,H*0.727);
+  ctx.font='500 '+(H*0.027)+'px Arial,sans-serif';
+  ctx.fillStyle='#6B7280'; ctx.fillText(lookupText,W/2,H*0.775,W-PAD*4);
+  ctx.font='500 '+(H*0.022)+'px Arial,sans-serif';
+  ctx.fillStyle='#9CA3AF'; ctx.fillText('Powered by PhotoDay',W/2,H*0.962);
+}
+function drawPoster(ctx, W, H, cfg, logo) {
+  const {primary:p,secondary:s,jobName,date,cta,lookupText}=cfg;
+  const tp=onColor(p),ts=onColor(s),PAD=W*0.08;
+  ctx.fillStyle=p; ctx.fillRect(0,0,W,H);
+  ctx.beginPath(); ctx.arc(W*1.15,H*0.12,W*0.82,0,Math.PI*2);
+  ctx.fillStyle=hexToRgba(s,0.07); ctx.fill();
+  ctx.beginPath(); ctx.arc(-W*0.15,H*0.85,W*0.62,0,Math.PI*2);
+  ctx.fillStyle=hexToRgba(s,0.07); ctx.fill();
+  ctx.fillStyle=s; ctx.fillRect(0,0,W,H*0.062);
+  ctx.font='800 '+(H*0.026)+'px Arial,sans-serif';
+  ctx.fillStyle=ts; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(jobName,W/2,H*0.031,W-PAD*2); ctx.textBaseline='alphabetic';
+  const ls=W*0.24; drawLogo(ctx,logo,(W-ls)/2,H*0.082,ls,s);
+  ctx.strokeStyle=hexToRgba(tp,0.22); ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(PAD*2,H*0.28); ctx.lineTo(W-PAD*2,H*0.28); ctx.stroke();
+  ctx.font='900 '+(H*0.12)+'px "Arial Black",Arial,sans-serif';
+  ctx.fillStyle=tp; ctx.textAlign='center'; ctx.fillText('PICTURE',W/2,H*0.418);
+  ctx.fillStyle=s; ctx.fillText('DAY!',W/2,H*0.548);
+  ctx.strokeStyle=hexToRgba(tp,0.22);
+  ctx.beginPath(); ctx.moveTo(PAD*2,H*0.585); ctx.lineTo(W-PAD*2,H*0.585); ctx.stroke();
+  ctx.font='600 '+(H*0.038)+'px Arial,sans-serif';
+  ctx.fillStyle=hexToRgba(tp,0.75); ctx.textAlign='center';
+  ctx.fillText('MARK YOUR CALENDAR',W/2,H*0.642);
+  ctx.font='700 '+(H*0.066)+'px Arial,sans-serif';
+  ctx.fillStyle=s; ctx.fillText(date,W/2,H*0.725);
+  ctx.strokeStyle=hexToRgba(tp,0.22);
+  ctx.beginPath(); ctx.moveTo(PAD*2,H*0.76); ctx.lineTo(W-PAD*2,H*0.76); ctx.stroke();
+  const bw=W*0.72,bh=H*0.072;
+  ctxBtn(ctx,cta,(W-bw)/2,H*0.79,bw,bh,s,ts,H*0.027,14);
+  ctx.font='600 '+(H*0.027)+'px Arial,sans-serif';
+  ctx.fillStyle=hexToRgba(tp,0.72); ctx.textAlign='center';
+  ctx.fillText(lookupText,W/2,H*0.906,W-PAD*2);
+  ctx.fillStyle=s; ctx.fillRect(0,H*0.938,W,H*0.062);
+  ctx.font='500 '+(H*0.019)+'px Arial,sans-serif';
+  ctx.fillStyle=ts; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('Powered by PhotoDay  ·  photoday.io',W/2,H*0.969);
+  ctx.textBaseline='alphabetic';
+}
+
+/* ══════════════════════════════════════════════
+   GENERATE
+══════════════════════════════════════════════ */
+function fmtDate(v) {
+  if (!v) return '';
+  return new Date(v + 'T12:00:00').toLocaleDateString('en-US',
+    { month:'long', day:'numeric', year:'numeric' });
+}
+
+function validate() {
+  const fields = [
+    ['job-name',  'Job name is required.'],
+    ['job-date',  'Picture day date is required.']
+  ];
+  for (const [id, msg] of fields) {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) {
+      el.style.borderColor = '#EF4444';
+      setTimeout(() => { el.style.borderColor = ''; }, 2000);
+      alert(msg); return false;
+    }
+  }
+  if (!selJobType)  { alert('Please select a job type.'); return false; }
+  if (!selGallery)  { alert('Please select a gallery type.'); return false; }
+  const isPG = selGallery === 'public' || selGallery === 'group';
+  if (isPG && !document.getElementById('access-code').value.trim()) {
+    alert('Access code required for Public/Group galleries.'); return false;
+  }
+  if (selGallery === 'private' && !document.getElementById('gallery-url').value.trim()) {
+    alert('Gallery URL required for Private galleries.'); return false;
+  }
+  if (selAssets.size === 0) {
+    alert('Please select at least one asset to generate.'); return false;
+  }
+  return true;
+}
+
+async function generate() {
+  if (!validate()) return;
+  const jobName  = document.getElementById('job-name').value.trim();
+  const dateFmt  = fmtDate(document.getElementById('job-date').value);
+  const code     = document.getElementById('access-code').value.trim();
+  const galUrl   = document.getElementById('gallery-url').value.trim();
+  const isPG     = selGallery === 'public' || selGallery === 'group';
+  const apReq    = document.getElementById('ap-required').checked;
+  const hasOff   = !apReq && document.getElementById('has-offer').checked;
+  const offerAmt = hasOff ? document.getElementById('offer-amount').value.trim() : '';
+  const colors   = getEffectiveColors();
+
+  let cta;
+  if (apReq) cta = 'REGISTER FOR PICTURE DAY';
+  else if (hasOff && offerAmt) cta = 'Buy Now, Save ' + offerAmt;
+  else cta = 'Order Photos Online';
+
+  const lookupText = isPG
+    ? 'Text "' + code + '" to 90738 or visit my.photoday.io'
+    : 'Visit ' + galUrl;
+
+  const cfg = {
+    primary: colors.dark, secondary: colors.light,
+    jobName, date: dateFmt, cta, lookupText, accessCode: code, isPG
+  };
+
+  // Show output with loading state
+  const out = document.getElementById('out-section');
+  out.classList.add('show');
+  document.getElementById('assets-output').innerHTML =
+    '<div style="text-align:center;padding:40px;color:var(--gray);">' +
+    '<div style="font-size:28px;animation:spin 1s linear infinite;display:inline-block">⚙️</div>' +
+    '<div style="margin-top:12px;font-size:14px;font-weight:700;">Generating ' + selAssets.size +
+    ' asset' + (selAssets.size !== 1 ? 's' : '') + '…</div></div>';
+  out.scrollIntoView({ behavior:'smooth', block:'start' });
+
+  // Yield to let the browser paint the loading state
+  await new Promise(r => setTimeout(r, 60));
+
+  // Load logo
+  const logoSrc = logoBase64 || (document.getElementById('logo-url').value.trim() || null);
+  const logoImg = await loadImg(logoSrc);
+
+  const SIZES     = [[1200,545],[300,600],[728,90],[1080,1350],[1050,1500],[2000,3000]];
+  const FILENAMES = ['email-flyer-banner','vertical-web-banner','horizontal-web-banner',
+                     'social-graphic','reminder-cards','picture-day-poster'];
+  const DRAWERS   = [drawEmailBanner,drawVerticalBanner,drawHorizontalBanner,
+                     drawSocialGraphic,drawReminderCard,drawPoster];
+  const sorted    = [...selAssets].sort((a,b) => a-b);
+  const cards     = [];
+
+  for (const idx of sorted) {
+    const [W, H] = SIZES[idx];
+    const cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    DRAWERS[idx](cv.getContext('2d'), W, H, cfg, logoImg);
+
+    const asset   = ASSETS[idx];
+    const dataUrl = cv.toDataURL('image/png');
+    const fname   = FILENAMES[idx] + '-' + jobName.replace(/[^a-z0-9]/gi,'-').toLowerCase() + '.png';
+
+    // Scale preview: max 500px wide, max 260px tall
+    const scale = Math.min(500/W, 260/H, 1);
+    const pw = Math.round(W*scale), ph = Math.round(H*scale);
+
+    cards.push(
+      '<div style="border:1.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px;">' +
+      '<div style="background:#F8FAFC;padding:10px 14px;border-bottom:1px solid var(--border);' +
+           'display:flex;align-items:center;justify-content:space-between;">' +
+      '<div><div style="font-size:13px;font-weight:800;color:#0F172A;">' + asset.icon + ' ' + asset.name + '</div>' +
+           '<div style="font-size:11px;color:#6366F1;font-family:monospace;font-weight:600;">' + asset.dims + ' · PNG</div></div>' +
+      '<a href="' + dataUrl + '" download="' + fname + '" ' +
+         'style="padding:7px 16px;background:var(--blue);color:#fff;border-radius:8px;' +
+                'font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap;">⬇ Download</a>' +
+      '</div>' +
+      '<div style="padding:14px;background:#fff;display:flex;justify-content:center;align-items:center;">' +
+      '<img src="' + dataUrl + '" width="' + pw + '" height="' + ph + '" ' +
+           'style="border-radius:6px;box-shadow:0 2px 10px rgba(0,0,0,.12);" /></div></div>'
+    );
+  }
+
+  document.getElementById('assets-output').innerHTML = cards.join('');
+}
+
+/* ══════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════ */
+init();
+</script>
+</body>
+</html>
