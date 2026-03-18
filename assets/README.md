@@ -1,30 +1,30 @@
-# Assets
+# Assets — Brand Reference
 
-PhotoDay brand assets shared across all environments (dev / test / main).
+PhotoDay brand tokens and design reference for developers.
+
+> **Note:** `index.html` is fully self-contained — all brand tokens are inlined directly
+> in the `<style>` block. These files are **reference only** for when this tool gets
+> folded into the main PhotoDay app or extended into multi-file components.
 
 ## Structure
 
 ```
 assets/
-├── brand.css        CSS custom properties — import this in every HTML page
-├── brand-tokens.js  Same tokens as a JS object — import for Canvas rendering
+├── brand.css        CSS custom properties — reference source of truth
+├── brand-tokens.js  Same tokens as a JS object — for Canvas/React integration
 ├── fonts.css        Typography scale + Adobe Fonts setup instructions
 └── logos/
     ├── README.md    Logo usage rules + download links
     └── *.png/svg    (place downloaded logo files here)
 ```
 
-## Quick Start
+## Using in a React/Next.js context
 
-```html
-<head>
-  <!-- 1. Adobe Fonts (swap [KIT_ID] for real Typekit kit ID) -->
-  <!-- <link rel="stylesheet" href="https://use.typekit.net/[KIT_ID].css"> -->
-
-  <!-- 2. Brand tokens + typography -->
-  <link rel="stylesheet" href="assets/brand.css">
-  <link rel="stylesheet" href="assets/fonts.css">
-</head>
+```js
+// Import tokens into a component or global stylesheet
+import '../assets/brand-tokens.js'; // exposes window.PD
+// or in CSS:
+// @import './assets/brand.css';
 ```
 
 ## Color Reference

@@ -8,9 +8,9 @@ A browser-based tool for PhotoDay studios to generate branded marketing assets �
 
 | Environment | Branch | URL |
 |-------------|--------|-----|
-| **Production** | `main` | _Vercel production URL_ |
-| **Staging / QA** | `test` | _Vercel preview URL_ |
-| **Development** | `dev` | _Vercel preview URL_ |
+| **Production** | `main` | https://picture-day-kit-generator-nk45.vercel.app |
+| **Staging / QA** | `test` | Vercel preview — auto-generated on push to `test` |
+| **Development** | `dev` | Vercel preview — auto-generated on push to `dev` |
 
 ---
 
@@ -37,7 +37,7 @@ All assets are fully branded with the studio's:
 1. Open the tool in any modern browser
 2. Fill out **4 steps**: Job Details → Brand Colors → Logo → Select Assets
 3. Click **Generate** — assets render instantly on-screen using HTML Canvas
-4. Download each PNG directly — no login, no upload, no Canva needed
+4. Download each **JPEG** directly — no login, no upload, no Canva needed
 
 ---
 
@@ -115,7 +115,8 @@ This tool is built as a standalone static HTML file with **zero external depende
 - **Routing**: Mount at `/tools/asset-generator` or as a modal/drawer in the job flow
 - **Logo loading**: Currently fetched via user-provided URL; could pull from the job's PhotoDay CDN URL
 - **Colors**: Could auto-populate from the studio's brand settings in PhotoDay
-- **Output**: PNG data URLs — can be posted directly to PhotoDay's media API instead of downloaded
+- **Output**: JPEG data URLs — can be posted directly to PhotoDay's media API instead of downloaded
+- **QR codes**: Generated via `api.qrserver.com` using the gallery access code; could swap to PhotoDay's own QR endpoint
 
 ---
 
