@@ -4,12 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PhotoDay — Picture Day Asset Generator</title>
-  <!-- PhotoDay Brand Assets -->
-  <link rel="stylesheet" href="assets/brand.css">
-  <link rel="stylesheet" href="assets/fonts.css">
   <style>
     :root {
-      /* Legacy local aliases → mapped to PhotoDay brand tokens */
+      /* ── PhotoDay Brand Tokens (inlined — no external file needed) ── */
+      --pd-green:         #48af94;
+      --pd-green-medium:  #2b6959;
+      --pd-purple:        #612ad7;
+      --pd-pink:          #ea4970;
+      --pd-gold:          #f4a42f;
+      --pd-violet-light:  #b4a0de;
+      --pd-violet-dark:   #0e071c;
+      --pd-white:         #ffffff;
+      --pd-black:         #000000;
+      --pd-gray-light:    #d3d3d5;
+      --pd-gray:          #6b6b73;
+      --pd-gray-medium:   #404045;
+      --pd-gray-dark:     #202023;
+      --pd-bg-dark:       #0b0b1f;
+      --pd-bg-light:      #f4f4f6;
+      --pd-font-display:  'Helvetica Neue', Arial, sans-serif;
+      --pd-font-text:     'Helvetica Neue', Arial, sans-serif;
+      --pd-font-serif:    Georgia, serif;
+      /* ── Aliases ── */
       --blue:       var(--pd-purple);
       --blue-dk:    #4e1faf;
       --navy:       var(--pd-bg-dark);
@@ -176,8 +192,8 @@
     .theme-mood { font-size: 12px; color: var(--gray); margin-top: 2px; }
 
     /* ── ASSET GRID ── */
-    .asset-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .asset-card { border: 1.5px solid var(--border); border-radius: 12px; padding: 16px 16px;
+    .asset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .asset-card { border: 1.5px solid var(--border); border-radius: 14px; padding: 20px 18px;
                   position: relative; cursor: pointer; transition: all .18s; user-select: none; }
     .asset-card:hover { border-color: var(--blue); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.09); }
     .asset-card.selected { border-color: var(--blue); background: #EFF6FF; }
@@ -266,7 +282,8 @@
 
     @media (max-width: 700px) {
       .jt-grid, .palette-grid { grid-template-columns: repeat(3, 1fr); }
-      .asset-grid, .kit-grid  { grid-template-columns: repeat(1, 1fr); }
+      .asset-grid              { grid-template-columns: repeat(2, 1fr); }
+      .kit-grid                { grid-template-columns: repeat(1, 1fr); }
       .gal-grid, .row, .row3  { grid-template-columns: 1fr; }
       .hdr, .how-to            { padding: 14px 18px; }
       .wrap                    { padding: 0 14px; }
@@ -807,7 +824,7 @@ function buildAssetGrid() {
        <div class="asset-desc">${a.desc}</div>
      </div>`;
   }).join('');
-  document.getElementById('asset-grid').innerHTML = controls + `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">${cards}</div>`;
+  document.getElementById('asset-grid').innerHTML = controls + `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">${cards}</div>`;
 }
 
 function toggleAsset(i) {
@@ -1350,9 +1367,6 @@ async function generate() {
 ══════════════════════════════════════════════ */
 init();
 </script>
-
-<!-- PhotoDay Brand Tokens (shared JS object for canvas renderers) -->
-<script src="assets/brand-tokens.js"></script>
 
 <footer style="text-align:center;padding:24px 16px 32px;font-family:var(--pd-font-text);font-size:12px;color:var(--pd-gray);letter-spacing:0.04em;">
   <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI1LjQuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCA4MDAgNTM4LjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDgwMCA1MzguNDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtmaWxsOiNGRkZGRkY7fQo8L3N0eWxlPgo8ZyBpZD0iTGF5ZXJfMl8wMDAwMDA2NTA1OTkwNjM1OTY0Mjk5NjczMDAwMDAwNTMzMDg2NDU0MTY1NzE5MTM0Nl8iPgoJPGcgaWQ9IkxheWVyXzEtMiI+CgkJPHBhdGggY2xhc3M9InN0MCIgZD0iTTQwMCw1MzguNGMtMzcsMC03My42LTExLjMtMTA3LjQtMzAuMWMtMzMuOS0xOC42LTY0LjgtNDQuMy05NC4yLTczLjdjLTExLjItMTEuMi0xNC41LTI2LTUuNi0zNwoJCQljNy43LTkuNiwyNS41LTkuMywzNC41LTRsMC4yLDAuMWMzMS4yLDE4LjYsNDguOSwzMC4xLDc5LjcsNDIuOGMzMC45LDEyLjYsNjEuOCwyMC4zLDkyLjcsMjAuMmwwLDBjMzAuOSwwLjEsNjEuOC03LjYsOTIuNy0yMC4yCgkJCWMzMC45LTEyLjgsNDguNi0yNC4zLDc5LjctNDIuOGwwLjItMC4xYzktNS40LDI2LjgtNS42LDM0LjUsNGM4LjksMTEuMSw1LjcsMjUuOC01LjYsMzdjLTI5LjQsMjkuNC02MC40LDU1LjEtOTQuMiw3My43CgkJCUM0NzMuNiw1MjcuMSw0MzcsNTM4LjMsNDAwLDUzOC40TDQwMCw1MzguNHogTTAsMjA2LjZjMCw4NS4xLDU3LjUsMTQyLjUsMTQzLjEsMTQyLjVzMTQ0LjItNTcuNSwxNDQuMi0xNDEuNHMtNTgtMTQyLTE0My4xLTE0MgoJCQlDNTguNiw2NS43LDAsMTIzLjgsMCwyMDYuNnogTTIxOC4yLDIwNy43YzAsNDUuOS0zMS41LDgwLjEtNzQuNiw4MC4xYy00My42LDAtNzUuMS0zNC4yLTc1LjEtODEuMmMwLTQ2LjQsMzEuNS04MC4xLDc1LjEtODAuMQoJCQlTMjE4LjIsMTYwLjIsMjE4LjIsMjA3Ljd6IE00MzEsMzg1YzI2LDAsNDUuOS03LjcsNTgtMTkuOWM4LjgtOC4zLDEzLjMtMTguMiwxMy4zLTI5LjhjMC0yMC40LTE2LjYtMzEuNS0xOS4zLTMwLjQKCQkJYy03LjIsMTAuNS0xOC4yLDE4LjItMzMuNywxOC4yYy0yMS41LDAtMjkuOC0xMy4zLTI5LjgtMzkuOFYxMzIuNmg0Ny41YzIyLjEsMCwzMi05LjksMzItMjguN3YtNWMwLTE3LjctOS40LTI3LjEtMzEuNS0yNy4xaC00NwoJCQlWMzcuNkM0MjAuNSw4LjgsNDA2LjYsMCwzODYuMiwwSDM3OWMtMjIuMSwwLTM0LjgsMTIuMS0zNC44LDM3LjZ2MzQuMmgtMTQuNGMtMjEuNSwwLTMxLjUsMTAuNS0zMS41LDI4Ljd2NC40CgkJCWMwLDE3LjcsMTAsMjcuNiwzMiwyNy42aDEzLjh2MTU5LjZDMzQ0LjIsMzUzLjUsMzcxLjgsMzg1LDQzMSwzODV6IE01MTIuOCwyMDYuNmMwLDg1LjEsNTcuNSwxNDIuNSwxNDMuMSwxNDIuNQoJCQlTODAwLDI5MS43LDgwMCwyMDcuN3MtNTgtMTQyLTE0My4xLTE0MkM1NzEuMyw2NS43LDUxMi43LDEyMy44LDUxMi44LDIwNi42TDUxMi44LDIwNi42eiBNNzMxLDIwNy43YzAsNDUuOS0zMS41LDgwLjEtNzQuNiw4MC4xCgkJCWMtNDMuNywwLTc1LjEtMzQuMi03NS4xLTgxLjJjMC00Ni40LDMxLjUtODAuMSw3NS4xLTgwLjFTNzMwLjksMTYwLjIsNzMxLDIwNy43TDczMSwyMDcuN3oiLz4KCTwvZz4KPC9nPgo8L3N2Zz4K"
